@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Dispatch: an envelope on the app's navy, with the flap in the accent blue. -->
+  <rect width="64" height="64" rx="12" fill="#1b2a3a"/>
+  <rect x="10" y="18" width="44" height="30" rx="4" fill="#eaf1fa"/>
+  <path d="M10 22 L32 38 L54 22 L54 28 L32 44 L10 28 Z" fill="#2b7de9"/>
+  <path d="M10 22 L32 38 L54 22" fill="none" stroke="#1b2a3a" stroke-width="2.5" stroke-linejoin="round"/>
+</svg>
