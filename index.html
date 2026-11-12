@@ -1026,6 +1026,211 @@ html[data-look=modern] .ol-askq{border-radius:12px 12px 2px 12px}
 
 html[data-look=modern][data-theme="dark"] .dp-frame{border-radius:8px}
 
+/* Dispatch: the look of its own - not Outlook's. A dark frame (the top bar and the app rail) round
+   a light workspace; one box in the top bar that searches, runs a command or asks Claude; no
+   ribbon, a slim bar of the actions that apply; folders on the canvas under a New button; the
+   list and the reading pane as cards; a conversation read as a conversation (thread.js); one
+   accent, the owner's to pick. Every rule is under html[data-own], which dpApplyTheme (util.js)
+   sets over data-look=modern, so this file is drawn over modern.css and the two Outlook looks
+   never see it. look.js builds the pieces this file paints. Carried last. */
+#dkRail,#dkBar,#dkCompose,#dkFab,#dkBrand,#dkState,.dk-sres,.ol-tellglass{display:none}   /* this look's own pieces, absent from the other two */
+
+html[data-own]{
+  --dk-accent:#E4502A;--dk-ink:#C53E18;--dk-chrome:#161B26;--dk-chrome2:#222938;--dk-chrome-ink:#C9D0DC;
+  --ol-blue:var(--dk-ink);--ol-blue-dk:color-mix(in srgb,var(--dk-accent) 82%,#000);--ol-unread:var(--dk-accent);
+  --ol-blue-lt:color-mix(in srgb,var(--dk-accent) 11%,var(--ol-bg));--ol-sel:color-mix(in srgb,var(--dk-accent) 9%,var(--ol-bg));--ol-cur:color-mix(in srgb,var(--dk-accent) 34%,var(--ol-bg));
+  --ol-canvas:#F1F2F5;--ol-r:14px;--ol-line:#E3E5EA;--ol-line2:#EEF0F3;--ol-ink:#1B1F27;--ol-dim:#5C6370;--ol-dim2:#8A919C;--ol-hover:#F3F4F7;--ol-bg2:#F3F4F7;
+  --ol-card:0 0 0 1px rgba(22,27,38,.05),0 1px 2px rgba(22,27,38,.05);--list-w:420px;--row-h:72px;
+  --ol-font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI Variable Text","Segoe UI",Inter,Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+html[data-own][data-accent=indigo]{--dk-accent:#5B54E8;--dk-ink:#4A43D6}
+html[data-own][data-accent=teal]{--dk-accent:#0E8F8A;--dk-ink:#0B7A76}
+html[data-own][data-accent=blue]{--dk-accent:#2F6FEB;--dk-ink:#2459C9}
+html[data-own][data-accent=graphite]{--dk-accent:#4A5362;--dk-ink:#3A4250}
+html[data-own][data-theme="dark"]{
+  --dk-ink:color-mix(in srgb,var(--dk-accent) 62%,#fff);--dk-chrome:#0D0F14;--dk-chrome2:#1C2029;
+  --ol-canvas:#15171C;--ol-bg:#1E2127;--ol-bg2:#262A31;--ol-bg3:#22252B;--ol-hover:#282C34;--ol-line:#31353D;--ol-line2:#292D34;--ol-ink:#ECEEF2;--ol-dim:#A3AAB6;--ol-dim2:#7C8490;
+  --ol-card:0 0 0 1px rgba(255,255,255,.04);
+}
+html[data-own] #dpApp{background:var(--dk-chrome)}
+html[data-own] input:focus-visible,html[data-own] select:focus-visible,html[data-own] textarea:focus-visible,html[data-own] button:focus-visible{outline-color:var(--dk-accent)}
+html[data-own] #olRibbon,html[data-own] #olStatus,html[data-own] #olNav,html[data-own] #olTitleText,html[data-own] .ol-search,html[data-own] .ol-qat .sep{display:none}
+
+/* ---- the top bar: the brand, the one box, the state of the mail, the account */
+/* the page is drawn edge to edge (viewport-fit=cover), so on a phone installed to the home screen the top bar and the tab bar keep clear of the clock and the home indicator */
+html[data-own] #olTitle{height:calc(52px + env(safe-area-inset-top));flex-basis:calc(52px + env(safe-area-inset-top));background:var(--dk-chrome);padding:env(safe-area-inset-top) 14px 0 0;gap:10px;font-size:13px}
+html[data-own] .ol-qat{display:contents}
+html[data-own] #olMenuBtn{order:0;margin-left:8px}
+html[data-own] #dkBrand{display:inline-flex;align-items:center;gap:10px;order:1;width:312px;flex:0 0 auto;padding-left:14px;color:#fff;font-size:16px;letter-spacing:-.01em}
+html[data-own] .dk-mark{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:9px;background:var(--dk-accent);color:#fff}
+html[data-own] .dk-mark svg{transform:translate(-1px,1px)}
+html[data-own] .ol-tell{order:2;flex:1 1 auto;max-width:720px;min-width:0;height:36px;margin:0;padding:0 12px;gap:9px;border:1px solid transparent;border-radius:10px;background:var(--dk-chrome2);color:var(--dk-chrome-ink)}
+html[data-own] .ol-tell:hover{background:#2B3344;border-color:transparent}
+html[data-own] .ol-tell:focus-within{background:var(--ol-bg);border-color:var(--dk-accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--dk-accent) 30%,transparent)}
+html[data-own] .ol-tell svg{color:var(--dk-chrome-ink);width:16px;height:16px}
+html[data-own] .ol-tell:focus-within svg{color:var(--dk-ink)}
+html[data-own] .ol-tellbulb{display:none} html[data-own] .ol-tellglass{display:block}
+html[data-own] #olTell{flex:1;width:auto;min-width:0;color:#fff;font-size:14px;background:none;border:none;outline:none;padding:0}
+html[data-own] #olTell::placeholder{color:#8E97A8}
+html[data-own] .ol-tell:focus-within #olTell{color:var(--ol-ink)}
+html[data-own] .ol-tellmenu{left:0;right:0;width:auto;max-width:none;top:calc(100% + 6px);border-radius:12px;padding:6px;border-color:var(--ol-line)}
+html[data-own] .ol-tellrow{padding:9px 12px;font-size:13.5px;border-radius:8px}
+html[data-own] .ol-tellrow svg,html[data-own] .ol-tell:focus-within .ol-tellrow svg{color:var(--dk-ink)}
+html[data-own] .ol-tellrow[data-kind="ask"] svg{color:var(--ol-ai)}
+html[data-own] #dkState{display:inline;order:3;margin-left:auto;color:#8E97A8;font-size:12px;white-space:nowrap}
+html[data-own] #olSync{order:4;width:32px;height:32px;border-radius:8px;color:var(--dk-chrome-ink)}
+html[data-own] #olMe{order:5;margin:0;width:32px;height:32px;border:none;background:var(--dk-accent);font-size:12.5px}
+html[data-own] #olMe:hover{background:var(--dk-accent);filter:brightness(1.1)}
+
+/* ---- the frame: the rail in the chrome, the workspace a light sheet with one round corner */
+html[data-own] #dpBody{padding:0 10px 10px 0;gap:10px;position:relative;z-index:0}
+html[data-own] #dpBody::before{content:"";position:absolute;z-index:-1;inset:0 0 0 64px;background:var(--ol-canvas);border-radius:16px 0 0 0}
+html[data-own] #dkRail{display:flex;flex-direction:column;align-items:center;gap:4px;width:64px;flex:0 0 64px;padding:8px 0 2px;margin-bottom:-10px}
+html[data-own] #dkRail a,html[data-own] #dkRail button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:52px;height:50px;border:none;border-radius:11px;background:none;color:#9AA3B2;font:inherit;font-size:10.5px;
+  text-decoration:none;cursor:pointer;position:relative}
+html[data-own] #dkRail a:hover,html[data-own] #dkRail button:hover{background:var(--dk-chrome2);color:#fff}
+html[data-own] #dkRail a.on{background:var(--dk-chrome2);color:#fff}
+html[data-own] #dkRail a.on svg{color:var(--dk-accent)}
+html[data-own] #dkRail a.on::before{content:"";position:absolute;left:-6px;top:14px;bottom:14px;width:3px;border-radius:2px;background:var(--dk-accent)}
+html[data-own] #dkRail .sp{flex:1}
+html[data-own] #dkRail button.ai svg{color:#B98AF0}
+
+/* ---- the folders: on the canvas, under the New button */
+html[data-own] #dpSide{background:none;box-shadow:none;border-radius:0;width:238px;flex-basis:238px;padding-top:12px;overflow:visible}
+html[data-own] #dkCompose{display:flex;align-items:center;justify-content:center;gap:8px;height:42px;margin:0 6px 10px 12px;border:none;border-radius:12px;background:var(--dk-accent);color:#fff;font:inherit;font-size:14.5px;font-weight:600;cursor:pointer;
+  box-shadow:0 1px 2px rgba(22,27,38,.2),0 4px 12px color-mix(in srgb,var(--dk-accent) 32%,transparent)}
+html[data-own] #dkCompose:hover{filter:brightness(1.07)}
+html[data-own] #dpFolders{padding:0 0 10px}
+html[data-own] .dp-folder{margin:1px 0 1px 6px;border-radius:9px;min-height:32px;padding:5px 10px 5px 12px}
+html[data-own] .dp-folder:hover{background:rgba(22,27,38,.06)}
+html[data-own] .dp-folder.on{background:var(--ol-bg);color:var(--ol-ink);box-shadow:var(--ol-card)}
+html[data-own] .dp-folder.on svg{color:var(--dk-accent)}
+html[data-own] .dp-badge{background:none;color:var(--dk-ink);padding:0 2px;font-size:12.5px}
+html[data-own] .dp-badge.total{background:none}
+html[data-own] .ol-fghead{padding-left:18px}
+html[data-own] .dp-calrow{margin-left:6px}
+
+/* ---- the bar of actions, where the ribbon was */
+html[data-own] #dpMain{flex-direction:column;gap:10px;padding-top:12px}
+html[data-own] #dkBar{display:flex;align-items:center;gap:6px;flex:0 0 auto;min-height:36px;overflow-x:auto;scrollbar-width:none}
+html[data-own] #dkBar::-webkit-scrollbar{display:none}
+html[data-own] #dkBar .sp{flex:1}
+html[data-own] .dk-where{display:none}
+html[data-own] .dk-g{display:flex;align-items:center;gap:2px;flex:0 0 auto;padding:3px;border-radius:11px;background:var(--ol-bg);box-shadow:var(--ol-card)}
+html[data-own] .dk-b{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 11px;border:none;border-radius:8px;background:none;color:var(--ol-ink);font:inherit;font-size:13px;white-space:nowrap;cursor:pointer}
+html[data-own] .dk-b svg{color:var(--ol-dim);flex:0 0 auto}
+html[data-own] .dk-b:hover{background:var(--ol-hover)}
+html[data-own] .dk-b:disabled{opacity:.38;cursor:default;background:none}
+html[data-own] .dk-b.pri:not(:disabled){background:var(--dk-accent);color:#fff;font-weight:600}
+html[data-own] .dk-b.pri:not(:disabled) svg{color:#fff}
+html[data-own] .dk-b.pri:not(:disabled):hover{filter:brightness(1.07)}
+html[data-own] .dk-b.ai svg{color:var(--ol-ai)}
+html[data-own] .dk-b.on{background:var(--ol-sel);color:var(--dk-ink);font-weight:600}
+html[data-own] .dk-b.on svg{color:var(--dk-ink)}
+html[data-own] .dk-seg .dk-b{padding:0 13px}
+@media (max-width:1240px){ html[data-own] .dk-g:not(.dk-seg) .dk-b:not(.pri):not(.ai) svg+span{display:none} }
+@media (max-width:1100px){ html[data-own] .dk-g:not(.dk-seg) .dk-b svg+span{display:none} html[data-own] #dkBrand{width:auto;padding-right:16px} }
+
+/* ---- the list */
+html[data-own] #dpList{overflow:hidden}
+html[data-own] .ol-filter{padding:10px 12px 8px}
+html[data-own] .ol-fl.on{background:var(--ol-ink);color:var(--ol-bg)}
+html[data-own] .dk-sres{display:flex;align-items:center;gap:8px;padding:10px 14px 2px;font-size:13px;color:var(--ol-dim)}
+html[data-own] .dk-sres span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ol-ink);font-weight:600}
+html[data-own] .dp-row{padding:11px 14px;border-bottom-color:var(--ol-line2)}
+html[data-own] .dp-row.unread::before{left:4px;top:50%;bottom:auto;width:7px;height:7px;margin-top:-4px;border-radius:50%;background:var(--dk-accent)}
+html[data-own] .dp-row.has-cv{padding-left:14px}
+html[data-own] .ol-cvcaret,html[data-own] .dp-sub{display:none}
+html[data-own] .dp-row.open{background:var(--ol-sel)}
+html[data-own] .dp-row.cur{box-shadow:inset 3px 0 0 var(--dk-accent)}
+html[data-own] .ol-dgroup{color:var(--ol-dim2);padding:10px 16px 5px}
+
+/* ---- a conversation (thread.js) */
+html[data-own] #dpRead{background:var(--ol-bg)}
+html[data-own] .dk-thead{padding:20px 26px 6px}
+html[data-own] .dk-thead .ol-rsubj{font-size:22px;font-weight:650;letter-spacing:-.015em;margin:0 0 6px}
+html[data-own] .dk-tmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px}
+html[data-own] .dk-extras .ol-rinfo,html[data-own] .dk-extras .ol-ai{margin-left:26px;margin-right:26px}
+html[data-own] .dk-msgs{padding:12px 18px 4px;display:flex;flex-direction:column;gap:8px;container-type:inline-size}
+/* a narrow reading pane: the body under the whole card, not indented past the face */
+@container (max-width:520px){ html[data-own] .dk-msg .ol-rbody{padding:2px 14px 14px} html[data-own] .dk-msg .ol-ratts,html[data-own] .dk-msg .ol-rinfo{padding-left:14px;margin-left:0} }
+@media (max-width:1240px){ html[data-own]{--list-w:360px} }
+html[data-own] .dk-msg{border:1px solid var(--ol-line);border-radius:12px;background:var(--ol-bg);overflow:hidden}
+html[data-own] .dk-msg:not(.open){background:var(--ol-bg3)}
+html[data-own] .dk-msg:not(.open):hover{border-color:color-mix(in srgb,var(--dk-accent) 40%,var(--ol-line))}
+html[data-own] .dk-mh{display:flex;align-items:center;gap:12px;padding:11px 12px 11px 14px;cursor:pointer;min-width:0}
+html[data-own] .dk-msgs>.dk-msg:only-child .dk-mh{cursor:default}
+html[data-own] .dk-mh .dp-ava{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;flex:0 0 38px;border-radius:50%;color:#fff;font-size:13.5px;font-weight:600}
+html[data-own] .dk-msg:not(.open) .dp-ava{width:28px;height:28px;flex-basis:28px;font-size:11px}
+html[data-own] .dk-who{flex:1;min-width:0;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html[data-own] .dk-sub{color:var(--ol-dim);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html[data-own] .dk-msg:not(.open) .dk-who{display:flex;gap:10px;align-items:baseline}
+html[data-own] .dk-msg:not(.open) .dk-who b{flex:0 0 auto}
+html[data-own] .dk-msg:not(.open) .dk-sub{flex:1;font-size:13px}
+html[data-own] .dk-date{flex:0 0 auto;color:var(--ol-dim);font-size:12.5px;white-space:nowrap}
+html[data-own] .dk-msg .ol-rbody{padding:4px 16px 18px 64px}
+html[data-own] .dk-msg .ol-ratts{padding:0 16px 8px 64px}
+html[data-own] .dk-msg .ol-rinfo{margin:0 16px 8px 64px}
+html[data-own] .dk-reply{display:flex;gap:8px;flex-wrap:wrap;padding:8px 18px 26px}
+html[data-own] .dk-reply .dp-btn{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 15px;border-radius:10px;font-size:13.5px}
+html[data-own] .dk-reply .dp-btn svg{color:var(--dk-ink)}
+html[data-own] .dk-reply .dp-btn.ai svg{color:var(--ol-ai)}
+
+/* ---- what modern.css painted Outlook blue */
+html[data-own] .dp-btn.primary,html[data-own] .dp-send.dp-btn{background:var(--dk-accent);border-color:var(--dk-accent)}
+html[data-own] .dp-cwh{background:var(--dk-chrome)}
+html[data-own] #olBackstage{inset:0 0 0 64px;background:var(--ol-canvas);border-radius:16px 0 0 0;overflow:hidden}
+html[data-own] .ol-bsnav{background:none;color:var(--ol-ink);width:220px;flex-basis:220px;padding-top:14px}
+html[data-own] .ol-bsnav button{color:var(--ol-ink)}
+html[data-own] .ol-bsnav button:hover{background:rgba(22,27,38,.06)}
+html[data-own] .ol-bsnav button.on{background:var(--ol-bg);box-shadow:var(--ol-card);font-weight:600}
+html[data-own] .ol-bsbody{background:var(--ol-bg);margin:12px 10px 10px 0;border-radius:var(--ol-r);box-shadow:var(--ol-card)}
+html[data-own] .ol-bsbody h1{font-weight:650;letter-spacing:-.015em}
+html[data-own] .ol-tileic{border-radius:12px}
+html[data-own] #dpToast{background:var(--dk-chrome)}
+html[data-own] #dpComposeHost,html[data-own] .dp-cw{bottom:0}
+html[data-own] #olAsk{bottom:10px;right:10px;margin-top:12px;border-radius:var(--ol-r);border:none}
+html[data-own][data-theme="dark"] .ol-fl.on{background:var(--ol-ink);color:#15171C}
+
+/* ---- a phone: the rail is the tab bar at the foot, New floats over the list, the bar is icons */
+@media (max-width:760px){
+  html[data-own] #olTitle{height:calc(50px + env(safe-area-inset-top));flex-basis:calc(50px + env(safe-area-inset-top));padding-right:10px;gap:8px}
+  html[data-own] #dkBrand{width:auto;padding-left:0}
+  html[data-own] #dkBrand b,html[data-own] #dkState,html[data-own] #olSync{display:none}
+  html[data-own] .ol-tell{display:inline-flex;height:34px}
+  html[data-own] #dpBody{padding:0 0 calc(58px + env(safe-area-inset-bottom));gap:0}
+  html[data-own] #dpBody::before{inset:0;border-radius:0}
+  html[data-own] #dkRail{position:fixed;left:0;right:0;bottom:0;z-index:38;width:auto;height:calc(58px + env(safe-area-inset-bottom));flex-direction:row;justify-content:space-around;padding:0 4px env(safe-area-inset-bottom);margin:0;background:var(--dk-chrome)}
+  html[data-own] #dkRail .sp{display:none}
+  html[data-own] #dkRail a.on::before{left:14px;right:14px;top:-4px;bottom:auto;width:auto;height:3px}
+  html[data-own] #dpSide{top:0;bottom:0;width:min(300px,86vw);background:var(--ol-canvas);box-shadow:var(--ol-shadow);padding-top:14px;z-index:42}
+  html[data-own] body.side-open #dpScrim{inset:0;z-index:41}
+  html[data-own] #dpMain{padding-top:0;gap:0}
+  html[data-own] #dkBar{padding:7px 8px;gap:6px;background:var(--ol-canvas)}
+  html[data-own] .dk-b{padding:0 9px}
+  html[data-own] #dkBar:not(.acting) .dk-where{display:block;flex:1 1 auto;min-width:0;padding-left:8px;font-size:18px;font-weight:650;letter-spacing:-.01em;color:var(--ol-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  html[data-own] #dkBar:not(.acting) .sp,html[data-own] #dkBar:not(.acting) .dk-g:not(.dk-seg) .dk-b:disabled,html[data-own] #dkBar:not(.acting) .dk-g:not(:has(.dk-b:not(:disabled))){display:none}
+  html[data-own]:has(#dpMail.show-read) #dkFab,html[data-own] body.side-open #dkFab,html[data-own]:has(#olBackstage:not([hidden])) #dkFab{display:none}
+  html[data-own] #olBackstage{inset:0 0 calc(58px + env(safe-area-inset-bottom));border-radius:0;flex-direction:column}
+  html[data-own] .ol-bsnav{width:auto;flex:0 0 auto;display:flex;padding:8px;gap:4px;overflow-x:auto}
+  html[data-own] .ol-bsnav button{width:auto;margin:0;white-space:nowrap}
+  html[data-own] .ol-bsbody{margin:0;border-radius:0;padding:16px 14px}
+  html[data-own] .dk-g:not(.dk-seg) .dk-b svg+span{display:none}
+  html[data-own] #dkFab{display:inline-flex;align-items:center;justify-content:center;position:fixed;right:16px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:37;width:56px;height:56px;border:none;border-radius:18px;
+    background:var(--dk-accent);color:#fff;cursor:pointer;box-shadow:0 2px 4px rgba(22,27,38,.25),0 8px 20px color-mix(in srgb,var(--dk-accent) 40%,transparent)}
+  html[data-own] .dk-thead{padding:14px 14px 4px;display:block}
+  html[data-own] .dk-thead .dp-back{margin:0 0 4px -6px}
+  html[data-own] .dk-thead .ol-rsubj{font-size:19px}
+  html[data-own] .dk-extras .ol-rinfo,html[data-own] .dk-extras .ol-ai{margin-left:10px;margin-right:10px}
+  html[data-own] .dk-msgs{padding:10px 8px 4px}
+  html[data-own] .dk-msg .ol-rbody{padding:2px 12px 14px}
+  html[data-own] .dk-msg .ol-ratts,html[data-own] .dk-msg .ol-rinfo{padding-left:12px;margin-left:0}
+  html[data-own] .dk-reply{padding:8px 8px 22px}
+  html[data-own] .dp-cw{height:100%}
+  html[data-own] #olAsk{bottom:0;right:0;margin-top:0;border-radius:0}
+}
+@media print{ #dkRail,#dkBar,#dkFab,.dk-reply{display:none !important} }
+
 </style>
 </head>
 <body>
@@ -1044,7 +1249,9 @@ html[data-look=modern][data-theme="dark"] .dp-frame{border-radius:8px}
       <button id="olSync" type="button" title="Send/Receive All Folders (F9)" aria-label="Send/Receive All Folders"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 4v6h-6M1 20v-6h6M20.5 9A9 9 0 005.6 5.6L1 10M3.5 15a9 9 0 0014.9 3.4L23 14"/></svg></button>
       <span class="sep"></span>
     </div>
+    <span id="dkBrand"></span>
     <span id="olTitleText">Dispatch</span>
+    <span id="dkState"></span>
     <button id="olMe" type="button" title="Account" aria-label="Account"></button>
   </div>
   <div id="olRibbon">
@@ -1052,7 +1259,9 @@ html[data-look=modern][data-theme="dark"] .dp-frame{border-radius:8px}
     <div id="olRibbonBody"></div>
   </div>
   <div id="dpBody">
+    <nav id="dkRail" aria-label="Apps"></nav>
     <aside id="dpSide">
+      <button id="dkCompose" type="button"></button>
       <div id="dpFolders"></div>
       <nav id="olNav" aria-label="Modules">
         <a href="#mail/INBOX" data-mod="mail">Mail</a>
@@ -1064,6 +1273,7 @@ html[data-look=modern][data-theme="dark"] .dp-frame{border-radius:8px}
     </aside>
     <div id="dpScrim"></div>
     <main id="dpMain">
+      <div id="dkBar" role="toolbar" aria-label="Actions"></div>
       <section id="dpMail" aria-label="Mail">
         <div id="dpList"><div id="dpListHead"></div><div id="dpRows" role="listbox" aria-label="Messages"></div></div>
         <div id="dpRead" aria-label="Reading pane" aria-live="polite"></div>
@@ -1076,12 +1286,13 @@ html[data-look=modern][data-theme="dark"] .dp-frame{border-radius:8px}
     <div id="olBackstage" hidden></div>
   </div>
   <div id="olStatus"><span id="olStatusL"></span><span class="sp"></span><span id="olStatusR"></span></div>
+  <button id="dkFab" type="button" title="New" aria-label="New"></button>
   <div id="dpComposeHost"></div>
 </div>
 <div id="dpToast" role="status" aria-live="polite"></div>
 
 <script>
-/* Dispatch - build c29ee02
+/* Dispatch - build 1e04a5c
    This file is a GENERATED ARTIFACT assembled by build.py from src/dispatch/. Do not edit it by
    hand; edit the source modules and rebuild. Module order: helpers, the wire format, sign-in,
    the APIs, the cache, triage, Claude's one way in (ai.js), then the modules, and app.js last,
@@ -1261,13 +1472,19 @@ function dpToast(msg, action){
 /* Preferences, one JSON blob. The keys are namespaced because six apps share this localStorage. */
 var DP_PREF_DEFAULTS={theme:'auto',density:'cozy',images:'ask',markRead:true,signature:null,poll:60,notify:false,conv:true,preview:1,oldest:false,
   folders:'normal',pane:'right',zoom:1,pview:'people',tview:'simple',scanDays:45,favorites:['INBOX','SENT','DRAFT'],
-  ai:'claude-fable-5-2',aiVoice:true,focused:true,focusRules:{},undoSend:5,followOff:{},look:'modern'};
+  ai:'claude-fable-5-2',aiVoice:true,focused:true,focusRules:{},undoSend:5,followOff:{},look:'dispatch',lookV:0,accent:'vermilion'};
 function dpPrefs(){ var p={}; try{ p=JSON.parse(localStorage.getItem('dp.prefs')||'{}')||{}; }catch(e){}
   var out={}; for(var k in DP_PREF_DEFAULTS)out[k]=k in p?p[k]:DP_PREF_DEFAULTS[k]; return out; }
 function dpSetPref(k,v){ var p=dpPrefs(); p[k]=v; try{ localStorage.setItem('dp.prefs',JSON.stringify(p)); }catch(e){} dpApplyTheme(); return p; }
 function dpApplyTheme(){ var p=dpPrefs(); var root=document.documentElement;
   root.setAttribute('data-theme',p.theme==='auto'?'':p.theme); root.setAttribute('data-density',p.density);
-  root.setAttribute('data-look',p.look==='classic'?'classic':'modern'); }   /* the Modern look, or Outlook 2016 to the pixel (styles/modern.css) */
+  /* three looks: Outlook 2016 to the pixel (classic), its layout polished (modern, styles/modern.css), and the Dispatch look,
+     which is modern's base with data-own over it (styles/own.css, look.js) and an accent of the owner's choosing */
+  root.setAttribute('data-look',p.look==='classic'?'classic':'modern');
+  if(p.look!=='classic'&&p.look!=='modern')root.setAttribute('data-own','1'); else root.removeAttribute('data-own');
+  root.setAttribute('data-accent',p.accent||'vermilion');
+  var tc=document.querySelector('meta[name="theme-color"]'); if(tc)tc.setAttribute('content',root.hasAttribute('data-own')?'#161B26':'#0072C6');   /* the browser's own bar, the colour of the top bar under it */
+  if(typeof olLookLayout==='function')olLookLayout(); }
 
 /* Keyboard: is the person typing somewhere? Then a single-letter shortcut is theirs, not ours. */
 function dpTyping(e){ var t=e.target; if(!t)return false;
@@ -2330,6 +2547,7 @@ function olRibbonSpec(mod, tab){
 function olRenderRibbon(){
   var mod=DP.view.mod==='calendar'?'calendar':DP.view.mod, tabs=OL_TABS[mod]||['home'];
   if(tabs.indexOf(DP.ribbonTab)<0)DP.ribbonTab='home';
+  dkRenderBar();   /* the Dispatch look's bar, in step with the ribbon it stands in for (look.js) */
   var th=dpQ('#olTabBtns'); if(!th)return; dpClear(th);
   th.appendChild(dpEl('button.ol-file',{type:'button',text:'File',onclick:function(){ olBackstage('info'); }}));
   tabs.forEach(function(t){ th.appendChild(dpEl('button.ol-tab'+(DP.ribbonTab===t?'.on':''),{type:'button',text:OL_TAB_NAMES[t],data:{tab:t},onclick:function(){ DP.ribbonTab=t; olRenderRibbon(); }})); });
@@ -2360,9 +2578,10 @@ function olTitleUpdate(){
   var t=dpQ('#olTitleText'); if(!t)return; var v=DP.view, me=(DP.me&&DP.me.email)||'';
   var what=v.mod==='mail'?(v.q?'Search Results':dpViewTitle(v)):v.mod==='calendar'?'Calendar':v.mod==='people'?'People':v.mod==='tasks'?'Tasks':v.mod==='dashboard'?'Dispatch Today':'Dispatch';
   t.textContent=what+(me?' - '+me:'')+' - Dispatch';
+  var tb=dpQ('#olTell'); if(tb&&dpLook()==='dispatch'&&document.activeElement!==tb)tb.value=v.mod==='mail'&&v.q?v.q:'';   /* the top box shows the search on screen */
   var b=dpQ('#olMe'); if(b){ b.textContent=dpInitials(DP.me&&DP.me.name,me); b.title=((DP.me&&DP.me.name)||'')+(me?' <'+me+'>':''); b.onclick=function(){ olBackstage('info'); }; }
 }
-function olNavUpdate(){ dpQA('#olNav a').forEach(function(a){ a.classList.toggle('on',a.dataset.mod===DP.view.mod); }); }
+function olNavUpdate(){ dpQA('#olNav a,#dkRail a').forEach(function(a){ a.classList.toggle('on',a.dataset.mod===DP.view.mod); }); }
 function olStatusUpdate(){
   var L=dpQ('#olStatusL'), R=dpQ('#olStatusR'); if(!L||!R)return; dpClear(L); dpClear(R);
   if(DP.view.mod==='mail'){ var l=!DP.view.q&&dpLabelById(DP.view.label), rows=dpViewRows(DP.view);
@@ -2376,6 +2595,7 @@ function olStatusUpdate(){
   else R.appendChild(dpEl('span',{text:navigator.onLine===false?'Disconnected':'All folders are up to date.'}));
   R.appendChild(dpEl('span',{text:'Connected to: Google'}));
   if(DP.zoomText)R.appendChild(dpEl('span',{text:DP.zoomText}));
+  var ks=dpQ('#dkState'); if(ks)ks.textContent=DP.offline?'Working offline':DP.syncing?'Checking\u2026':navigator.onLine===false?'No connection':'Up to date';
 }
 /* the panes' shape from the View tab's choices */
 function olLayout(){
@@ -2384,6 +2604,106 @@ function olLayout(){
   if(mail){ mail.classList.toggle('pane-bottom',p.pane==='bottom'); mail.classList.toggle('pane-off',p.pane==='off'); }
   document.documentElement.style.fontSize=p.zoom&&p.zoom!==1?(100*p.zoom)+'%':'';
   DP.zoomText=p.zoom&&p.zoom!==1?Math.round(p.zoom*100)+'%':''; olStatusUpdate();
+}
+
+</script>
+<script>
+/* Dispatch: the look of its own. Three looks share one page: "dispatch" (the default: an app rail,
+   one box at the top that searches, runs a command or asks Claude, a slim bar of the actions that
+   apply, a conversation read as a conversation), "modern" (Outlook's layout, polished) and
+   "classic" (Outlook 2016 to the pixel). The two Outlook looks draw the ribbon (ribbon.js); this
+   file draws what the Dispatch look has in its place, from the SAME functions the ribbon's
+   buttons call, so a command behaves identically in every look. Which look is on is two
+   attributes on <html> set by dpApplyTheme (util.js): data-look (classic | modern, the base
+   styles) and data-own (the Dispatch look, drawn over modern's). styles/own.css is its paint. */
+function dpLook(){ var l=dpPrefs().look; return l==='classic'||l==='modern'?l:'dispatch'; }
+/* v3577 stored "modern" as everyone's look the first time any preference was saved; the Dispatch
+   look takes its place once, and a choice made after that is kept. */
+function dpLookMigrate(){
+  try{ var p=JSON.parse(localStorage.getItem('dp.prefs')||'{}')||{}; if(p.lookV===2)return;
+    if(p.look==='modern')p.look='dispatch'; p.lookV=2; localStorage.setItem('dp.prefs',JSON.stringify(p)); }catch(e){}
+}
+/* the pieces that sit in a different place in each look: the command box is on the ribbon's tab
+   row in the Outlook looks and in the top bar in this one */
+function olLookLayout(){
+  var own=dpLook()==='dispatch', tell=dpQ('#olTellWrap'), title=dpQ('#olTitle'), tabs=dpQ('#olTabs'), box=dpQ('#olTell');
+  if(!tell||!title||!tabs)return;
+  if(own&&tell.parentNode!==title)title.insertBefore(tell,dpQ('#dkState'));
+  if(!own&&tell.parentNode!==tabs)tabs.appendChild(tell);
+  if(box)box.placeholder=own?'Search mail, find a command, or ask Claude':'Tell me what you want to do';
+}
+/* the search box a key should land in: the one the look on screen shows */
+function dpFocusSearch(){ var q=dpLook()==='dispatch'?dpQ('#olTell'):(dpQ('#dpQ')||dpQ('#olTell')); if(q){ q.focus(); if(q.select)q.select(); } }
+var DK_RAIL=[['dashboard','dash','Today','#dashboard'],['mail','mail','Mail','#mail/INBOX'],['calendar','calendar','Calendar','#calendar'],['people','people','People','#people'],['tasks','tasks','Tasks','#tasks']];
+/* built once: the rail, the brand, the New button over the folders, and a phone's floating one */
+function dkInit(){
+  var rail=dpQ('#dkRail'); if(!rail||rail.firstChild)return;
+  DK_RAIL.forEach(function(r){ rail.appendChild(dpEl('a',{href:r[3],title:r[2],data:{mod:r[0]}},[dpIcon(r[1],20),dpEl('span',{text:r[2]})])); });
+  rail.appendChild(dpEl('span.sp'));
+  rail.appendChild(dpEl('button.ai',{type:'button',title:'Ask Claude',onclick:function(){ dpAskOpen(); }},[dpIcon('sparkle',20),dpEl('span',{text:'Ask'})]));
+  rail.appendChild(dpEl('a',{href:'#settings',title:'Options'},[dpIcon('settings',20),dpEl('span',{text:'Options'})]));
+  var brand=dpQ('#dkBrand'); if(brand){ brand.appendChild(dpEl('span.dk-mark',[dpIcon('send',18)])); brand.appendChild(dpEl('b',{text:'Dispatch'})); }
+  var make=function(){ var m=DP.view.mod; if(m==='calendar')dpEventEditor(null,{start:new Date()}); else if(m==='people'){ DP.people.editing=true; DP.people.sel=null; dpRenderPeople(); }
+    else if(m==='tasks'){ var i=dpQ('.dp-tadd input'); if(i)i.focus(); } else dpCompose({}); document.body.classList.remove('side-open'); };
+  var nb=dpQ('#dkCompose'); if(nb){ nb.appendChild(dpIcon('plus',18)); nb.appendChild(dpEl('span',{text:'New mail'})); nb.onclick=make; }
+  var fab=dpQ('#dkFab'); if(fab){ fab.appendChild(dpIcon('plus',24)); fab.onclick=make; }
+}
+/* The bar: groups of buttons for the module on screen. A button is {icon, label, run} with `off`
+   (does not apply right now), `on` (pressed), `pri` (the one to reach for), `ai` (Claude's),
+   `menu` (opens one) and `seg` on a group for a set of views. */
+function dkBarSpec(mod){
+  var p=dpPrefs(), T=olMailTargets, any=T().length>0, open=!!DP.view.thread, v=DP.view;
+  var B=function(icon,label,run,o){ return Object.assign({icon:icon,label:label,run:run},o||{}); };
+  if(mod==='mail'){
+    var first=DP.threads[T()[0]]||{}, bin=/^(TRASH|SPAM)$/.test(v.label);
+    return [
+      {items:[B('reply','Reply',function(){ dpReplyOpen('reply'); },{off:!open,pri:1}),B('replyAll','Reply all',function(){ dpReplyOpen('replyAll'); },{off:!open}),B('forward','Forward',function(){ dpReplyOpen('forward'); },{off:!open})]},
+      {items:[B('archive','Archive',function(){ dpMailAct('archive',T()); },{off:!any||bin}),B('trash',v.label==='TRASH'?'Restore':'Delete',function(){ dpMailAct(v.label==='TRASH'?'untrash':'trash',T()); },{off:!any}),
+        B('folder','Move',null,{menu:'labels',off:!any}),B('flag','',function(){ dpMailAct(first.starred?'unstar':'star',T(),{silent:true}); },{off:!any,on:!!first.starred,title:first.starred?'Unflag':'Flag'}),
+        B(first.unread?'mailOpen':'mail','',function(){ dpMailAct(first.unread?'read':'unread',T(),{silent:true}); },{off:!any,title:first.unread?'Mark as read':'Mark as unread'})]},
+      {items:[B('sparkle','Summarize',function(){ dpAiSummarize(); },{off:!open,ai:1}),B('edit','Draft reply',function(){ dpAiDraftDialog(dpOpenMsg()); },{off:!open,ai:1})]},
+      {sp:1},
+      {items:[B('more','',null,{title:'View and more',menu:[
+        {label:'Focused Inbox',icon:p.focused?'check':null,run:function(){ dpSetPref('focused',!p.focused); dpOpenView(Object.assign({},DP.view,{tab:'',thread:null})); }},
+        {label:'Group by conversation',icon:p.conv?'check':null,run:function(){ dpSetPref('conv',!p.conv); dpRenderList(); }},{sep:true},
+        {label:'Reading pane on the right',icon:p.pane==='right'?'check':null,run:function(){ dpSetPref('pane','right'); olLayout(); }},{label:'Reading pane below',icon:p.pane==='bottom'?'check':null,run:function(){ dpSetPref('pane','bottom'); olLayout(); }},
+        {label:'No reading pane',icon:p.pane==='off'?'check':null,run:function(){ dpSetPref('pane','off'); olLayout(); }},{sep:true},
+        {label:p.density==='compact'?'Comfortable rows':'Compact rows',icon:'list',run:function(){ dpSetPref('density',p.density==='compact'?'cozy':'compact'); dpRenderList(); }},
+        {label:'Mark all as read',icon:'mailOpen',run:function(){ var ids=dpViewRows(DP.view).filter(function(r){ return r.unread; }).map(function(r){ return r.id; }); if(ids.length)dpMailAct('read',ids,{silent:true}); else dpToast('Nothing unread here.'); }},
+        {label:'Report junk',icon:'spam',run:function(){ if(T().length)dpMailAct('spam',T()); }},{label:'New folder…',icon:'folder',run:dpNewLabel},{sep:true},
+        {label:'Keyboard shortcuts',icon:'list',run:dpShowShortcuts},{label:'Options…',icon:'settings',run:function(){ location.hash='#settings'; }}]})]}];
+  }
+  if(mod==='calendar'){ var cv=DP.cal.view, V=function(k,label){ return B(null,label,function(){ dpCalGo(k); },{on:cv===k}); };
+    return [{seg:1,items:[V('day','Day'),V('workweek','Work week'),V('week','Week'),V('month','Month'),V('agenda','Agenda')]},{sp:1},
+      {items:[B('people','Meeting',function(){ dpEventEditor(null,{start:new Date(),meeting:true}); })]}]; }
+  if(mod==='people'){ var c=DP.people.sel, who=function(){ return (DP.contacts||[]).filter(function(y){ return y.rn===c; })[0]; };
+    return [{items:[B('mail','E-mail',function(){ var x=who(); if(x&&x.emails[0])dpCompose({to:[{name:x.name,email:x.emails[0]}]}); },{off:!c,pri:1}),
+        B('calendar','Meeting',function(){ var x=who(); dpEventEditor(null,{start:new Date(),meeting:true,guests:x&&x.emails[0]?[x.emails[0]]:[]}); },{off:!c}),B('trash','Delete',function(){ var x=who(); if(x)dpContactDelete(x); },{off:!c})]},
+      {sp:1},{seg:1,items:[B(null,'Cards',function(){ dpSetPref('pview','people'); dpRenderPeople(); },{on:p.pview!=='list'}),B(null,'List',function(){ dpSetPref('pview','list'); dpRenderPeople(); },{on:p.pview==='list'})]}]; }
+  if(mod==='tasks'){ var t=DP.tasks.open;
+    return [{items:[B('checkCircle','Complete',function(){ if(t)dpTaskComplete(t); },{off:!t,pri:1}),B('flag','Due tomorrow',function(){ dpTaskDue(t,1); },{off:!t}),B('trash','Delete',function(){ if(t)dpTaskRemove(t); },{off:!t})]},
+      {sp:1},{items:[B('check',DP.tasks.showDone?'Hide completed':'Show completed',function(){ DP.tasks.showDone=!DP.tasks.showDone; dpLoadTaskItems(); },{on:!!DP.tasks.showDone})]},
+      {seg:1,items:[B(null,'Simple',function(){ dpSetPref('tview','simple'); dpRenderTasks(); },{on:p.tview!=='detailed'}),B(null,'Detailed',function(){ dpSetPref('tview','detailed'); dpRenderTasks(); },{on:p.tview==='detailed'})]}]; }
+  if(mod==='dashboard')return [{items:[B('refresh','Read mailbox',function(){ dpScanMailbox({}); },{off:!!(DP.scan&&DP.scan.running),pri:1}),
+      B('clock','Last '+p.scanDays+' days',null,{menu:[30,45,60,90].map(function(d){ return {label:'Last '+d+' days',icon:p.scanDays===d?'check':null,run:function(){ dpSetPref('scanDays',d); dpScanMailbox({}); }}; })})]},
+    {items:[B('sparkle','AI recap',function(){ dpAiRecap(); },{ai:1}),B('bulb','Ask Claude',function(){ dpAskOpen(); },{ai:1})]}];
+  return [];
+}
+/* what is on screen, in a word: a phone has no folder pane to say it */
+function dkWhere(){ var v=DP.view; return v.mod==='mail'?(v.q?'Search':dpViewTitle(v)):v.mod==='calendar'?'Calendar':v.mod==='people'?'People':v.mod==='tasks'?'Tasks':v.mod==='dashboard'?'Today':'Dispatch'; }
+function dkRenderBar(){
+  var bar=dpQ('#dkBar'); if(!bar)return; dpClear(bar);
+  var mod=DP.view.mod, nb=dpQ('#dkCompose span'); if(nb)nb.textContent=mod==='calendar'?'New event':mod==='people'?'New contact':mod==='tasks'?'New task':'New mail';
+  if(dpLook()!=='dispatch')return;
+  /* acting: something is open or picked, so the bar is its actions; otherwise a phone's bar is the view's name and what can be done to nothing */
+  bar.classList.toggle('acting',mod==='calendar'||mod==='mail'&&(!!DP.view.thread||olMailTargets().length>0));
+  bar.appendChild(dpEl('b.dk-where',{text:dkWhere()}));
+  dkBarSpec(mod).forEach(function(g){
+    if(g.sp){ bar.appendChild(dpEl('span.sp')); return; }
+    bar.appendChild(dpEl('div.dk-g'+(g.seg?'.dk-seg':''),g.items.map(function(it){
+      return dpEl('button.dk-b'+(it.pri?'.pri':'')+(it.ai?'.ai':'')+(it.on?'.on':''),{type:'button',title:it.title||it.label,'aria-label':it.title||it.label,disabled:!!it.off,data:{cmd:it.title||it.label},
+        onclick:function(e){ if(it.menu)dpMenu(e.currentTarget,it.menu==='labels'?olLabelMenuItems(false):it.menu); else if(it.run)it.run(e); }},[it.icon?dpIcon(it.icon,16):null,it.label?dpEl('span',{text:it.label}):null]); })));
+  });
 }
 
 </script>
@@ -2398,7 +2718,7 @@ function olTellCommands(){
   var mod=DP.view.mod, out=[], seen={};
   var put=function(label,where,run,off){ var k=label.toLowerCase(); if(seen[k]||!run)return; seen[k]=1; out.push({label:label,where:where,run:run,off:!!off}); };
   (OL_TABS[mod]||['home']).forEach(function(tab){ olRibbonSpec(mod,tab).forEach(function(g){
-    var where=OL_TAB_NAMES[tab]+' › '+g.label;
+    var where=(dpLook()==='dispatch'?'':OL_TAB_NAMES[tab]+' › ')+g.label;   /* which ribbon tab it is on, where there is a ribbon */
     var add=function(it){ if(!it||!it.label)return; var name=it.label.replace(/\n/g,' ').replace(/\/ /,'/');
       if(Array.isArray(it.menu))it.menu.forEach(function(s){ if(s&&s.label)put(name+': '+s.label,where,s.run,it.disabled); });
       else if(!it.menu)put(name,where,it.run,it.disabled); };
@@ -2419,12 +2739,15 @@ function olTellMatch(q, cmds, n){
 /* does this read as a question for Claude rather than the name of a button? */
 function olTellIsQuestion(q){ q=String(q||'').trim(); return /\?$/.test(q)||/^(who|what|when|where|why|how|which|did|do|does|is|are|was|were|have|has|can|find|show me|list|summari[sz]e|tell me)\b/i.test(q)&&q.split(/\s+/).length>=3; }
 /* the rows under the box for what is typed: commands, a mail search, a question for Claude */
-function olTellRows(q){
+function olTellRows(q, searchFirst){
   q=String(q||'').trim(); if(!q)return [];
   var cmds=olTellMatch(q,olTellCommands()).map(function(c){ return {kind:'cmd',label:c.label,sub:c.off?c.where+' · not available right now':c.where,off:c.off,run:function(){ c.run({currentTarget:dpQ('#olTell')}); }}; });
   var search={kind:'search',label:'Search mail for “'+q+'”',sub:'Search',run:function(){ dpSearchGo(q); }};
-  var ask={kind:'ask',label:'Ask Claude: “'+q+'”',sub:dpAiKey()?'Claude looks it up in your mail':'Needs your Anthropic API key (File › Options)',run:function(){ dpAskOpen(q); }};
-  return olTellIsQuestion(q)?[ask].concat(cmds,[search]):cmds.concat([search,ask]);
+  var ask={kind:'ask',label:'Ask Claude: “'+q+'”',sub:dpAiKey()?'Claude looks it up in your mail':'Needs your Anthropic API key (Options)',run:function(){ dpAskOpen(q); }};
+  /* a question is Claude's. In the Outlook looks the box finds a command first, as Outlook's does; in the Dispatch look it is
+     the search box too (searchFirst), so there only a command named from its first letters comes ahead of the search */
+  var named=cmds.length&&cmds[0].label.toLowerCase().indexOf(q.toLowerCase())===0;
+  return olTellIsQuestion(q)?[ask].concat(cmds,[search]):(!searchFirst||named)?cmds.concat([search,ask]):[search].concat(cmds,[ask]);
 }
 function olTellInit(){
   var wrap=dpQ('#olTellWrap'); if(!wrap||wrap.firstChild)return;
@@ -2435,16 +2758,18 @@ function olTellInit(){
       [dpIcon(r.kind==='ask'?'sparkle':r.kind==='search'?'search':'bulb',14),dpEl('span.l',{text:r.label}),dpEl('span.s',{text:r.sub})])); }); };
   var close=function(){ rows=[]; paint(); };
   var pick=function(i){ var r=rows[i]; if(!r||r.off)return; box.value=''; close(); box.blur(); r.run(); };
-  box.addEventListener('input',function(){ rows=olTellRows(box.value); hi=0; paint(); });
-  box.addEventListener('focus',function(){ rows=olTellRows(box.value); hi=0; paint(); });
+  var own=function(){ return dpLook()==='dispatch'; };
+  box.addEventListener('input',function(){ rows=olTellRows(box.value,own()); hi=0; paint(); });
+  box.addEventListener('focus',function(){ rows=olTellRows(box.value,own()); hi=0; paint(); if(own())box.select(); });
   /* a blur closes the menu a moment later, unless the box has the focus again by then (a click on a row, a refocus) */
   box.addEventListener('blur',function(){ setTimeout(function(){ if(document.activeElement!==box)close(); },120); });
   box.addEventListener('keydown',function(e){
     if(e.key==='ArrowDown'){ e.preventDefault(); hi=Math.min(rows.length-1,hi+1); paint(); }
     else if(e.key==='ArrowUp'){ e.preventDefault(); hi=Math.max(0,hi-1); paint(); }
-    else if(e.key==='Enter'){ e.preventDefault(); pick(hi); }
-    else if(e.key==='Escape'){ e.stopPropagation(); box.value=''; close(); box.blur(); } });
-  wrap.appendChild(dpIcon('bulb',14)); wrap.appendChild(box); wrap.appendChild(menu);
+    else if(e.key==='Enter'){ e.preventDefault(); if(!box.value.trim()&&own()&&DP.view.q){ box.blur(); dpSearchGo(''); } else pick(hi); }   /* emptied and entered: the search is over */
+    else if(e.key==='Escape'){ e.stopPropagation(); box.value=own()&&DP.view.q?DP.view.q:''; close(); box.blur(); } });
+  var ic=function(n,c){ var s=dpIcon(n,14); s.setAttribute('class',c); return s; };   /* a bulb where it finds commands, a glass where it searches too (own.css) */
+  wrap.appendChild(ic('bulb','ol-tellbulb')); wrap.appendChild(ic('search','ol-tellglass')); wrap.appendChild(box); wrap.appendChild(menu);
 }
 
 </script>
@@ -2558,6 +2883,8 @@ function dpRenderListHead(){
       {label:'Current Mailbox',icon:scope==='mailbox'?'check':null,run:function(){ DP.searchScope='mailbox'; dpRenderListHead(); }},{label:'All Mailboxes',icon:null,run:function(){ DP.searchScope='mailbox'; dpRenderListHead(); }}]); }},
       [scope==='folder'?'Current Folder':'Current Mailbox',dpEl('span.ol-caret',{text:' ▼'})])]);
   head.appendChild(form);
+  /* the Dispatch look searches from the top box, so the list says what it is showing and how to leave it */
+  if(v.q)head.appendChild(dpEl('div.dk-sres',[dpIcon('search',14),dpEl('span',{text:'Results for \u201c'+v.q+'\u201d'}),dpEl('button.dp-link',{type:'button',text:'Clear',onclick:function(){ dpSearchGo(''); }})]));
   var p=dpPrefs();
   /* the Inbox with Focused Inbox on wears Focused / Other, and keeps the Unread filter in the By Date menu, as Outlook does; every other view wears All / Unread */
   var foc=dpFocusOn(v), tabBtn=function(label,on,to,key){ return dpEl('button.ol-fl'+(on?'.on':''),{type:'button',text:label,data:{tab:key},onclick:function(){ if(!on)dpOpenView(Object.assign({},v,to,{thread:null})); }}); };
@@ -2688,7 +3015,7 @@ function dpMailKeys(e){
     if(open||!DP.narrow())dpOpenThread(rows[n].id); };
   if(ctrl){
     var k=e.key.toLowerCase();
-    if(k==='e'||k==='f'&&!open){ var q=dpQ('#dpQ'); if(q){ q.focus(); q.select(); } }
+    if(k==='e'||k==='f'&&!open)dpFocusSearch();
     else if(k==='n')dpCompose({}); else if(k==='r'&&e.shiftKey&&open)dpReplyOpen('replyAll'); else if(k==='r'&&open)dpReplyOpen('reply'); else if(k==='f'&&open)dpReplyOpen('forward');
     else if(k==='q')dpMailAct('read',ids(),{silent:true}); else if(k==='u')dpMailAct('unread',ids(),{silent:true}); else if(k==='a'&&!e.shiftKey){ rows.forEach(function(r){ DP.sel[r.id]=1; }); dpRenderList(); }
     else return false;
@@ -2711,7 +3038,7 @@ function dpMailKeys(e){
     case 'a': if(open)dpReplyOpen('replyAll'); break;
     case 'f': if(open)dpReplyOpen('forward'); break;
     case 'v': case 'l': if(ids().length)dpLabelMenu(ids(),dpQ('#olRibbonBody .ol-bb')||dpQ('#dpListHead')); break;
-    case '/': dpQ('#dpQ').focus(); dpQ('#dpQ').select(); break;
+    case '/': dpFocusSearch(); break;
     case 'Escape': if(dpQA('.dp-menu').length)return false; if(dpSelected().length){ DP.sel={}; dpRenderList(); } else if(open)dpCloseThread(); else return false; break;
     case '?': dpShowShortcuts(); break;
     default: return false;
@@ -2835,6 +3162,7 @@ function dpOpenMsg(){ return DP.view.msg?DP.msgs[DP.view.msg]:null; }
 function dpReplyOpen(kind, msg){ msg=msg||dpOpenMsg(); if(!msg)return; dpCompose({mode:kind,msg:msg}); }
 
 function dpRenderMessage(host, row, msgs, m){
+  if(dpLook()==='dispatch'){ dkRenderThread(host,row,msgs,m); return; }   /* the Dispatch look reads the whole conversation (thread.js) */
   var me=DP.meSet||{}, mine=!!me[m.from.email], hue=dpHue(m.from.email);
   dpClear(host);
   var toLine=function(list){ return list.map(function(a){ return me[a.email]?(DP.me&&DP.me.name)||'me':(a.name||a.email); }).join('; '); };
@@ -2882,7 +3210,9 @@ async function dpDrawBody(body, m){
       dpEl('button.dp-link',{type:'button',text:'Download pictures',onclick:function(){ DP.imgOk[m.from.email]=1; dpDrawBody(body,m); }})]));
     var fr=dpEl('iframe.dp-frame',{sandbox:'allow-same-origin allow-popups allow-popups-to-escape-sandbox',title:'Message',scrolling:'no'});
     fr.srcdoc=dpBodyDoc(html,allow||!remote);
-    var size=function(){ try{ var d=fr.contentDocument; if(!d||!d.documentElement)return; fr.style.height=Math.max(40,d.documentElement.scrollHeight+8)+'px'; }catch(e){} };
+    /* the frame as tall as what it holds. A document is never shorter than its frame, so the frame is let go to nothing before it
+       is measured: measured as it stood, a two-line message sat in the 150px a frame starts at, and grew 8px with every measure */
+    var size=function(){ try{ var d=fr.contentDocument; if(!d||!d.documentElement)return; fr.style.height='0px'; fr.style.height=Math.max(40,d.documentElement.scrollHeight+8)+'px'; }catch(e){} };
     fr.addEventListener('load',function(){ size(); try{ if(window.ResizeObserver&&fr.contentDocument.body)new ResizeObserver(size).observe(fr.contentDocument.body); }catch(e){} setTimeout(size,400); setTimeout(size,2000); });
     body.appendChild(fr);
   } else body.appendChild(dpEl('div.dp-plain',{html:dpLinkify(m.text||'')}));
@@ -2921,6 +3251,59 @@ function dpEditDraft(m){
   dpGmDraftsList().then(function(ds){ var d=ds.find(function(x){ return x.message&&x.message.id===m.id; });
     if(!d){ dpToast('That draft is no longer there.'); return; } dpCompose({mode:'draft',msg:m,draftId:d.id}); },
     function(e){ dpToast('Could not open the draft: '+e.message); });
+}
+
+</script>
+<script>
+/* Dispatch: a conversation read as a conversation - the Dispatch look's reading pane. Outlook
+   shows one message and lists the others; here the whole exchange is on the page, oldest first,
+   each message a card: the one asked for (the newest, unless a row or a link named another) and
+   any still unread are open, the rest are a line each (who, the first words, when) that opens on
+   a click. The subject sits once at the top with the info bars and Claude's summary under it,
+   and the reply buttons sit once at the foot, where the reading ends. Every body is drawn by the
+   same sandboxed frame as in the other looks (reader.js, dpDrawBody). */
+function dkRenderThread(host, row, msgs, m, keep){
+  var top=host.scrollTop; dpClear(host);
+  /* which cards are open is kept for the conversation on screen: arriving at it opens the message asked for and the unread
+     ones; a card's own click (keep) redraws without opening anything, or shutting the one just shut would open it again */
+  var fresh=!(DP.thOpen&&DP.thOpen.id===row.id), st=DP.thOpen=fresh?{id:row.id,set:{}}:DP.thOpen;
+  if(fresh)msgs.forEach(function(x){ if(x.labelIds.indexOf('UNREAD')>=0)st.set[x.id]=1; });
+  if(!keep)st.set[m.id]=1;
+  var chips=Object.keys(row.labels||{}).map(function(id){ var l=dpLabelById(id); return l&&l.type==='user'?dpEl('span.dp-chip',{text:dpLabelName(l),title:l.name}):null; }).filter(Boolean);
+  host.appendChild(dpEl('div.dk-thead',[dpIBtn('back','Back to the list',dpCloseThread,'dp-back'),dpEl('h2.ol-rsubj',{text:m.subject||row.subject||'(no subject)'}),
+    dpEl('div.dk-tmeta',[dpEl('span.dp-dim',{text:msgs.length===1?'1 message':msgs.length+' messages'})].concat(chips))]));
+  var extras=dpEl('div.dk-extras'); host.appendChild(extras); dpReadExtras(extras,row,m);
+  var list=dpEl('div.dk-msgs'); host.appendChild(list);
+  msgs.forEach(function(x){ list.appendChild(dkMsgCard(host,row,msgs,x,!!st.set[x.id],x.id===m.id)); });
+  var last=msgs[msgs.length-1], rb=function(icon,label,fn,cls){ return dpEl('button.dp-btn'+(cls||''),{type:'button',onclick:fn},[dpIcon(icon,16),label]); };
+  host.appendChild(dpEl('div.dk-reply',[rb('reply','Reply',function(){ dpCompose({mode:'reply',msg:last}); }),rb('replyAll','Reply all',function(){ dpCompose({mode:'replyAll',msg:last}); }),
+    rb('forward','Forward',function(){ dpCompose({mode:'forward',msg:last}); }),rb('sparkle','Draft with Claude',function(){ dpAiDraftDialog(last); },'.ai')]));
+  var cur=dpQ('.dk-msg.cur',host); host.scrollTop=keep?top:cur&&msgs.length>1&&cur.offsetTop>host.clientHeight*0.5?cur.offsetTop-12:0;
+}
+function dkMsgCard(host, row, msgs, x, open, cur){
+  var me=DP.meSet||{}, mine=!!me[x.from.email], name=mine?(DP.me&&DP.me.name)||'me':(x.from.name||x.from.email), st=DP.thOpen;
+  var toLine=function(l){ return l.map(function(a){ return me[a.email]?'me':(a.name||a.email); }).join(', '); };
+  /* a click opens or shuts a card. The message the bar acts on is the one just opened, or, when one is shut, the last still open */
+  var toggle=function(){ if(msgs.length===1)return; var on=st.set[x.id]=!st.set[x.id], to=x;
+    if(on){ if(x.labelIds.indexOf('UNREAD')>=0&&dpPrefs().markRead)dpMarkMessageRead(row,x); }
+    else to=msgs.filter(function(y){ return st.set[y.id]; }).pop()||msgs[msgs.length-1];
+    DP.view.msg=to.id; dpSetHash(); dkRenderThread(host,row,msgs,to,true); olRenderRibbon(); };
+  var more=function(e){ e.stopPropagation(); dpMenu(e.currentTarget,[{label:'Reply',icon:'reply',run:function(){ dpCompose({mode:'reply',msg:x}); }},{label:'Reply all',icon:'replyAll',run:function(){ dpCompose({mode:'replyAll',msg:x}); }},
+    {label:'Forward',icon:'forward',run:function(){ dpCompose({mode:'forward',msg:x}); }},{sep:true},
+    {label:'Mark as unread',icon:'mail',run:function(){ dpGmModifyMessage(x.id,['UNREAD'],[]).then(function(){ x.labelIds.push('UNREAD'); dpCacheMessage(x); (row.msgs||[]).forEach(function(y){ if(y.id===x.id)y.unread=true; }); row.unread=true; row.labels.UNREAD=1; dpCacheThread(row); dpCloseThread(); dpRenderList(); dpRefreshCounts(); }); }},
+    {label:'Print',icon:'print',run:function(){ window.print(); }},{label:'Open in Gmail',icon:'link',run:function(){ window.open('https://mail.google.com/mail/#all/'+encodeURIComponent(row.id),'_blank','noopener'); }}]); };
+  var card=dpEl('div.dk-msg'+(open?'.open':'')+(cur?'.cur':'')+(x.labelIds.indexOf('UNREAD')>=0?'.unread':''),{data:{msg:x.id}});
+  card.appendChild(dpEl('div.dk-mh',{onclick:toggle,title:msgs.length>1?(open?'Collapse':'Expand'):''},[
+    dpEl('span.dp-ava',{style:{background:'hsl('+dpHue(x.from.email)+' 45% 42%)'},text:dpInitials(mine?(DP.me&&DP.me.name)||'me':x.from.name,x.from.email)}),
+    dpEl('div.dk-who',[dpEl('b',{text:name}),open&&(x.from.name||mine)?dpEl('span.dp-dim',{text:' <'+x.from.email+'>'}):null,
+      dpEl('div.dk-sub',{text:open?'to '+(toLine(x.to)||'nobody')+(x.cc.length?', cc '+toLine(x.cc):''):(x.snippet||'')})]),
+    dpEl('span.dk-date',{text:open&&host.clientWidth>=560?dpFmtOutlookDate(x.date):dpFmtListDate(x.date),title:dpFmtDateLong(x.date)}),
+    open?dpIBtn('reply','Reply',function(e){ e.stopPropagation(); dpCompose({mode:'reply',msg:x}); }):null,open?dpIBtn('more','More',more):null]));
+  if(!open)return card;
+  if(x.labelIds.indexOf('DRAFT')>=0)card.appendChild(dpEl('div.ol-rinfo',[dpIcon('edit',14),'This message has not been sent. ',dpEl('button.dp-link',{type:'button',text:'Edit draft',onclick:function(){ dpEditDraft(x); }})]));
+  if(x.atts&&x.atts.length)card.appendChild(dpEl('div.ol-ratts',x.atts.map(function(a){ return dpEl('button.dp-att',{type:'button',title:'Download '+a.name,onclick:function(){ dpDownloadAtt(x,a); }},[dpIcon(/^image\//.test(a.mime)?'image':'attach',14),dpEl('span.dp-attn',{text:a.name||'attachment'}),dpEl('span.dp-dim',{text:dpFmtSize(a.size)})]); })));
+  var body=dpEl('div.ol-rbody'); card.appendChild(body); dpDrawBody(body,x);
+  return card;
 }
 
 </script>
@@ -3425,7 +3808,8 @@ function dpAskLook(id){ var r=DP.threads[id]; return r?{subject:r.subject,inbox:
 function dpAskOpen(q){
   var A=DP.ask=DP.ask||{messages:[],items:[],busy:false,abort:null};
   var p=dpQ('#olAsk'); if(!p){ p=dpEl('aside#olAsk',{'aria-label':'Ask Claude'}); dpQ('#dpApp').appendChild(p); }
-  var rb=dpQ('#olRibbon'); p.style.top=DP.narrow()?'0px':Math.round(rb?rb.getBoundingClientRect().bottom:0)+'px'; p.hidden=false; A.open=true;
+  var rb=dpQ('#olRibbon'), tb=dpQ('#olTitle'), over=rb&&rb.offsetHeight?rb:tb;   /* under the ribbon, or under the top bar in the look that has no ribbon */
+  p.style.top=DP.narrow()?'0px':Math.round(over?over.getBoundingClientRect().bottom:0)+'px'; p.hidden=false; A.open=true;
   dpAskRender();
   if(q)dpAskRun(q); else{ var i=dpQ('#olAsk textarea'); if(i)i.focus(); }
 }
@@ -4064,7 +4448,7 @@ function dpRenderSettings(){
   var gmailSig=(DP.sendAs.find(function(s){ return s.isDefault; })||DP.sendAs[0]||{}).signature||'';
   var sig=dpEl('textarea',{rows:4,text:p.signature!=null?p.signature:dpHtmlToText(gmailSig),onchange:function(e){ dpSetPref('signature',e.target.value); }});
   var key=dpEl('input',{type:'password',value:dpAiKey()||'',placeholder:'sk-ant-…',autocomplete:'off',onchange:function(e){ dpSetAiKey(e.target.value.trim()); olRenderRibbon(); }});
-  return dpEl('div.dp-settings',[dpEl('h1',{text:'Outlook Options'}),
+  return dpEl('div.dp-settings',[dpEl('h1',{text:dpLook()==='dispatch'?'Options':'Outlook Options'}),
     sec('Mail',[row('Reading Pane',sel('pane',[['right','Right'],['bottom','Bottom'],['off','Off']],olLayout)),row('Message preview',sel('preview',[['0','Off'],['1','1 line'],['2','2 lines'],['3','3 lines']],function(){ dpSetPref('preview',+p.preview||+dpPrefs().preview); dpRenderList(); })),
       row('Pictures in mail',sel('images',[['ask','Ask before downloading (safer)'],['always','Always download']]),'A blocked picture cannot tell a sender that you opened their message.'),
       chk('markRead','Mark a message as read when it is shown in the Reading Pane'),chk('conv','Show as Conversations',function(){ dpRenderList(); }),
@@ -4072,7 +4456,8 @@ function dpRenderSettings(){
     sec('Compose',[row('Undo Send',sel('undoSend',[['0','Off: send at once'],['5','5 seconds'],['10','10 seconds'],['20','20 seconds'],['30','30 seconds']],function(){ dpSetPref('undoSend',+dpPrefs().undoSend); }),'A sent message waits this long, with an Undo, before it leaves.'),
       row('Signature',sig,'Plain text or HTML. Leave it as it is to use the signature from Gmail.'),
       dpEl('div.dp-cacts',[dpEl('button.dp-btn',{type:'button',text:'Use the Gmail signature',onclick:function(){ dpSetPref('signature',null); olBackstage('options'); }})])]),
-    sec('General',[row('Look',sel('look',[['modern','Modern'],['classic','Classic (Outlook 2016, to the pixel)']]),'Modern is the same Outlook layout with today\u2019s polish: rounded panes, colour, faces in the list.'),row('Theme',sel('theme',[['auto','Colorful (follow the system)'],['light','Colorful'],['dark','Black']])),row('Density',sel('density',[['cozy','Normal'],['compact','Compact']],function(){ dpRenderList(); })),
+    sec('General',[row('Look',sel('look',[['dispatch','Dispatch'],['modern','Outlook, modern'],['classic','Outlook 2016, to the pixel']],function(){ olRenderRibbon(); olLayout(); if(DP.view.mod==='mail'&&DP.view.thread)dpOpenThread(DP.view.thread,true,DP.view.msg); }),'Dispatch is the app\u2019s own design: one box to search or ask, a bar of the actions that apply, whole conversations. The other two keep Outlook\u2019s ribbon.'),
+      row('Accent',sel('accent',[['vermilion','Vermilion'],['indigo','Indigo'],['teal','Teal'],['blue','Blue'],['graphite','Graphite']]),'The colour of the Dispatch look.'),row('Theme',sel('theme',[['auto','Colorful (follow the system)'],['light','Colorful'],['dark','Black']])),row('Density',sel('density',[['cozy','Normal'],['compact','Compact']],function(){ dpRenderList(); })),
       row('Send/Receive every',dpEl('span.dp-dt',[dpEl('input',{type:'number',min:30,max:900,step:15,value:p.poll,onchange:function(e){ dpSetPref('poll',Math.max(30,Math.min(900,+e.target.value||60))); }}),dpEl('span',{text:'seconds'})]),'Gmail cannot push to a page with no server behind it, so Dispatch asks. Each check costs almost nothing.')]),
     sec('Dispatch Today (the dashboard)',[row('Read mail from the last',sel('scanDays',[['30','30 days'],['45','45 days'],['60','60 days'],['90','90 days']],function(){ dpSetPref('scanDays',+dpPrefs().scanDays); })),
       ]),
@@ -4088,7 +4473,7 @@ function dpAskNotify(){ if(!('Notification' in window))return; if(Notification.p
 <script>
 /* Dispatch: the state, the boot and the router. Everything before this file defines functions;
    this one holds the one state object they share and runs. */
-var DP_BUILD='c29ee02';
+var DP_BUILD='1e04a5c';
 var DP={threads:{},msgs:{},lists:{},labels:[],sendAs:[],me:null,meSet:{},historyId:null,view:{mod:'mail',label:'INBOX',q:'',thread:null,msg:null,unread:false},sel:{},cursor:null,drag:null,
   syncing:false,loading:false,ready:false,authError:null,imgOk:{},cidCache:{},lastSync:0,lastChange:0,hashSelf:'',chord:'',ribbonTab:'home',fold:{cats:true,imap:true},expanded:{},searchScope:'mailbox',offline:false,
   people:{q:'',sel:null,editing:false},tasks:{lists:[],listId:null,items:[],showDone:false,open:null,loading:false},
@@ -4096,7 +4481,7 @@ var DP={threads:{},msgs:{},lists:{},labels:[],sendAs:[],me:null,meSet:{},history
 DP.narrow=function(){ return window.matchMedia('(max-width: 760px)').matches; };
 
 function dpBoot(){
-  dpApplyTheme();
+  dpLookMigrate(); dkInit(); dpApplyTheme();
   dpAuthHandleRedirect();
   var cfg=dpAuthConfig();
   if(!cfg.clientId){ dpShowSetup(); return; }
@@ -4199,7 +4584,7 @@ function dpKeys(e){
       if(e.key==='g'){ DP.chord='g'; DP.chordAt=Date.now(); return; } }
     if(dpMailKeys(e))return;
   }
-  if((e.ctrlKey||e.metaKey)&&e.key==='k'){ e.preventDefault(); var q=dpQ('#dpQ'); if(q)q.focus(); }
+  if((e.ctrlKey||e.metaKey)&&e.key==='k'){ e.preventDefault(); dpFocusSearch(); }
 }
 window.addEventListener('hashchange',dpRoute);
 document.addEventListener('keydown',dpKeys);
