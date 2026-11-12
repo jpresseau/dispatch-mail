@@ -441,7 +441,7 @@ kbd{font:600 11.5px Consolas,ui-monospace,Menlo,monospace;background:var(--ol-bg
 .ol-sort button{border:none;background:none;color:var(--ol-ink);cursor:pointer;padding:2px 6px;font-size:12px;white-space:nowrap}
 .ol-sort button:hover{background:var(--ol-hover)}
 .dp-selall{display:none}
-#dpRows{flex:1;overflow:auto;overscroll-behavior:contain;min-height:0}
+#dpRows{flex:1;overflow:auto;overscroll-behavior:contain;min-height:0;position:relative}
 .dp-row{position:relative;display:flex;align-items:flex-start;gap:0;min-height:var(--row-h);padding:6px 10px 6px 14px;border-bottom:1px solid var(--ol-line2);cursor:default;user-select:none;background:var(--ol-bg)}
 .dp-row:hover{background:var(--ol-hover)}
 .dp-row.cur{background:var(--ol-hover);box-shadow:inset 0 0 0 1px #A9D0F0}
@@ -566,6 +566,11 @@ kbd{font:600 11.5px Consolas,ui-monospace,Menlo,monospace;background:var(--ol-bg
 /* the list's date groups, as Outlook heads them: Today, Yesterday, Monday, Last Week */
 .ol-dgroup{padding:5px 10px 3px 14px;font-size:12px;font-weight:600;color:var(--ol-blue);background:var(--ol-bg);border-bottom:1px solid var(--ol-line2);user-select:none}
 #olMe{display:none}
+/* a swipe on a phone (swipe.js): the row slides over a strip that says what letting go will do */
+.dp-row.swiping{z-index:1;transition:none}
+.dp-swipebg{position:absolute;left:0;right:0;display:flex;align-items:center;gap:8px;padding:0 22px;color:#fff;font-size:13px;font-weight:600;background:#9AA1AB;overflow:hidden}
+.dp-swipebg.left{justify-content:flex-end} .dp-swipebg.right{justify-content:flex-start}
+.dp-swipebg.armed.del{background:#D13438} .dp-swipebg.armed.arc{background:#0E8A16} .dp-swipebg.armed.read{background:#0F6CBD}
 
 /* Dispatch: the calendar, People, Tasks, the dashboard (drawn like Outlook Today), Settings
    (the File tab's Options page) and the two setup screens, all in the classic Outlook look. */
@@ -742,6 +747,23 @@ kbd{font:600 11.5px Consolas,ui-monospace,Menlo,monospace;background:var(--ol-bg
 .ol-tileic{display:inline-flex;color:var(--ol-blue);flex:0 0 auto}
 .ol-tile.crit .ol-tileic{color:#C50F1F} .ol-tile.amber .ol-tileic{color:#B7791F} .ol-tile.grey .ol-tileic{color:var(--ol-dim2)}
 @media (max-width:900px){ .ol-tiles{grid-template-columns:repeat(2,minmax(0,1fr))} }
+/* the setup screen's box for a client ID, the word to a second device, the first-visit recipe folded under them, and "Set up another device" (device.js) */
+.dp-have{margin:16px 0 12px}
+.dp-have label{display:block;font-weight:600;margin-bottom:4px}
+.dp-have input{width:100%;font-size:15px;padding:8px 10px}
+.dp-have .dp-dim{margin:8px 0 0;font-size:12.5px}
+.dp-other{display:flex;gap:10px;align-items:flex-start;background:var(--ol-bg2);border:1px solid var(--ol-line);padding:10px 12px;line-height:1.5;font-size:13px}
+.dp-other svg{flex:0 0 auto;margin-top:2px;color:var(--ol-blue)}
+.dp-other code,.dp-steps code{word-break:break-all}
+.dp-first{margin-top:14px}
+.dp-first summary{cursor:pointer;font-weight:600;padding:6px 0}
+.dp-okay{background:#DFF6DD;color:#0B5A0E;border:1px solid #B3E0B0;padding:8px 10px}
+.dp-dev{display:flex;gap:20px;align-items:flex-start}
+.dp-devqr{flex:0 0 auto;line-height:0;border:1px solid var(--ol-line);background:#fff;padding:4px}
+.dp-devtext{flex:1;min-width:0}
+.dp-devtext p{margin:0 0 8px;line-height:1.5}
+.dp-devlink{width:100%;font-family:Consolas,Menlo,monospace;font-size:12px}
+@media (max-width:760px){ .dp-dev{flex-direction:column;align-items:center} .dp-devtext{width:100%} .dp-setup{padding:20px 16px 18px} }
 
 /* Dispatch: Claude's places on the page (the summary card, the draft in a message window, the Ask
    pane), the Tell-me box, the reading pane's extra info bars and the dashboard's waiting list. All
@@ -991,6 +1013,7 @@ html[data-look=modern] .ol-bsnav{background:linear-gradient(180deg,#0F6CBD,#0C3B
 html[data-look=modern] .ol-bsnav button{border-radius:8px;margin:2px 10px;width:calc(100% - 20px);padding:9px 14px}
 html[data-look=modern] .ol-bsnav button.on{background:rgba(255,255,255,.22);font-weight:600}
 html[data-look=modern] .dp-setup{border-radius:14px}
+html[data-look=modern] .dp-other,html[data-look=modern] .dp-okay,html[data-look=modern] .dp-devqr{border-radius:10px}
 
 /* ---- Dispatch Today */
 html[data-look=modern] .ol-today{padding:22px 28px 34px}
@@ -1179,6 +1202,9 @@ html[data-own] .dk-reply .dp-btn.ai svg{color:var(--ol-ai)}
 /* ---- what modern.css painted Outlook blue */
 html[data-own] .dp-btn.primary,html[data-own] .dp-send.dp-btn{background:var(--dk-accent);border-color:var(--dk-accent)}
 html[data-own] .dp-cwh{background:var(--dk-chrome)}
+html[data-own] .dp-dlgh{background:var(--ol-bg);color:var(--ol-ink);padding:14px 10px 2px 20px}
+html[data-own] .dp-dlgh h2{font-size:17px;font-weight:650;letter-spacing:-.01em}
+html[data-own] .dp-dlgh .dp-ib{color:var(--ol-dim)} html[data-own] .dp-dlgh .dp-ib:hover{background:var(--ol-hover);color:var(--ol-ink)}
 html[data-own] #olBackstage{inset:0 0 0 64px;background:var(--ol-canvas);border-radius:16px 0 0 0;overflow:hidden}
 html[data-own] .ol-bsnav{background:none;color:var(--ol-ink);width:220px;flex-basis:220px;padding-top:14px}
 html[data-own] .ol-bsnav button{color:var(--ol-ink)}
@@ -1292,7 +1318,7 @@ html[data-own][data-theme="dark"] .ol-fl.on{background:var(--ol-ink);color:#1517
 <div id="dpToast" role="status" aria-live="polite"></div>
 
 <script>
-/* Dispatch - build 1e04a5c
+/* Dispatch - build 5bf9ee7
    This file is a GENERATED ARTIFACT assembled by build.py from src/dispatch/. Do not edit it by
    hand; edit the source modules and rebuild. Module order: helpers, the wire format, sign-in,
    the APIs, the cache, triage, Claude's one way in (ai.js), then the modules, and app.js last,
@@ -2824,7 +2850,7 @@ function dpRenderFolders(){
   if(left.length)rows.push(dpFolderGroup('imap','Other folders',left.map(function(n){ return dpFolderRow(n.label.id,dpImapLabel(n.label.name),0); })));
   host.appendChild(dpFolderGroup('acct',(DP.me&&DP.me.email)||'Mailbox',rows));
   if(!tree.length)host.appendChild(dpEl('div.dp-fnote',{text:'Folders you make in Gmail or here appear under the account.'}));
-  var inbox=dpLabelById('INBOX'); document.title=(inbox&&inbox.unread?'('+inbox.unread+') ':'')+'Dispatch';
+  var inbox=dpLabelById('INBOX'); document.title=(inbox&&inbox.unread?'('+inbox.unread+') ':'')+'Dispatch'; dpBadge(inbox&&inbox.unread);
   olTitleUpdate(); olStatusUpdate();
 }
 function dpRenderCountsLocal(){
@@ -3092,6 +3118,49 @@ function dpFocusAlways(ids, where){
   if(!names.length){ dpToast('There is no sender to make a rule for.'); return; }
   dpSetPref('focusRules',rules); DP.sel={}; dpRenderListHead(); dpRenderList();
   dpToast('Mail from '+names[0]+(names.length>1?' and '+(names.length-1)+' more':'')+' will always go to '+(where==='other'?'Other':'Focused')+'.',{label:'Undo',run:function(){ dpSetPref('focusRules',before); dpRenderListHead(); dpRenderList(); }});
+}
+
+</script>
+<script>
+/* Dispatch: a swipe on a row, for a phone. A finger drawn across a message acts on it without
+   opening it: to the left it leaves the Inbox (Archive; outside the Inbox, where there is nothing
+   to archive, it turns the read mark over), to the right it is deleted. The row follows the
+   finger over a strip that names what will happen, grey until the swipe is long enough to count
+   and coloured once it is; let go short of that and the row slides back. Deleted and archived
+   mail keeps the Undo the same commands give anywhere else (dpMailAct). Trash, Junk and Drafts
+   do not swipe: Delete there means something else. */
+function dpSwipeAction(dir, row, v){
+  if(!row||!v||v.label==='TRASH'||v.label==='SPAM'||v.label==='DRAFT')return null;
+  if(dir==='right')return {op:'trash',label:'Delete',icon:'trash',tone:'del'};
+  if(row.labels&&row.labels.INBOX)return {op:'archive',label:'Archive',icon:'archive',tone:'arc'};
+  return row.unread?{op:'read',label:'Mark as read',icon:'mailOpen',tone:'read',stays:true}:{op:'unread',label:'Mark as unread',icon:'mail',tone:'read',stays:true};
+}
+/* how far a swipe must go to count: a third of the row, and never more than a thumb's reach */
+function dpSwipeArmed(dx, w){ return Math.abs(dx)>=Math.min(w*0.34,150); }
+function dpSwipeInit(){
+  var host=dpQ('#dpList'); if(!host||host._swipe)return; host._swipe=1;
+  var s=null, lastAt=0;
+  var paint=function(){ var dir=s.dx<0?'left':'right', act=dpSwipeAction(dir,DP.threads[s.id],DP.view), armed=!!act&&dpSwipeArmed(s.dx,s.w);
+    if(!s.bg){ s.bg=dpEl('div.dp-swipebg'); s.el.parentNode.insertBefore(s.bg,s.el); s.bg.style.top=s.el.offsetTop+'px'; s.bg.style.height=s.el.offsetHeight+'px'; }
+    if(s.dir!==dir||s.armed!==armed){ s.dir=dir; s.armed=armed; s.act=act; dpClear(s.bg); s.bg.className='dp-swipebg '+dir+(act?' '+act.tone:'')+(armed?' armed':'');
+      if(act){ s.bg.appendChild(dpIcon(act.icon,18)); s.bg.appendChild(dpEl('span',{text:act.label})); } }
+    s.el.style.transform='translateX('+(act?s.dx:s.dx*0.25)+'px)'; };   /* with nothing to do here the row only gives a little */
+  var settle=function(st, go){ var el=st.el, bg=st.bg; el.style.transition='transform .16s ease-out';
+    el.style.transform=go&&!st.act.stays?'translateX('+(st.dx<0?-st.w:st.w)+'px)':'';
+    setTimeout(function(){ if(bg&&bg.parentNode)bg.parentNode.removeChild(bg); el.classList.remove('swiping'); el.style.transition='';
+      if(go){ if(st.act.stays)el.style.transform=''; dpMailAct(st.act.op,[st.id],st.act.stays?{silent:true}:undefined); } },170); };
+  host.addEventListener('touchstart',function(e){ s=null; if(e.touches.length!==1)return;
+    var el=e.target.closest&&e.target.closest('.dp-row'); if(!el||e.target.closest('button,a,input'))return;
+    var t=e.touches[0]; s={el:el,id:el.dataset.id,x:t.clientX,y:t.clientY,dx:0,on:false,w:el.offsetWidth}; },{passive:true});
+  host.addEventListener('touchmove',function(e){ if(!s)return; var t=e.touches[0], dx=t.clientX-s.x, dy=t.clientY-s.y;
+    if(!s.on){ if(Math.abs(dy)>10&&Math.abs(dy)>=Math.abs(dx)){ s=null; return; }   /* a scroll: the list's, not ours */
+      if(Math.abs(dx)<12)return; s.on=true; s.el.classList.add('swiping'); }
+    e.preventDefault(); s.dx=dx; paint(); },{passive:false});
+  var up=function(cancel){ if(!s)return; var st=s; s=null; if(!st.on)return; lastAt=Date.now(); settle(st,!cancel&&!!st.act&&dpSwipeArmed(st.dx,st.w)); };
+  host.addEventListener('touchend',function(){ up(false); });
+  host.addEventListener('touchcancel',function(){ up(true); });
+  /* the tap a browser may still send after the finger lifts does not open the row that was swiped */
+  host.addEventListener('click',function(e){ if(Date.now()-lastAt<400){ e.stopPropagation(); e.preventDefault(); } },true);
 }
 
 </script>
@@ -4376,6 +4445,142 @@ async function dpAiRecap(){
 
 </script>
 <script>
+/* Dispatch: a QR code, made here. "Set up another device" (device.js) shows this page's address
+   with the client ID in it, and a phone's camera is the quickest way to carry that from a screen
+   to a pocket. The page may not fetch a library or call a chart service (it has no server and
+   talks to Google and Anthropic only), so the code is built in the page: byte mode, error
+   correction level L (a clean screen is being read, not a creased label), versions 1 to 10, which
+   is up to 271 bytes. The matrix is checked against a real decoder in the tests' fixture. */
+var DP_QR_L=[null,[26,7,1],[44,10,1],[70,15,1],[100,20,1],[134,26,1],[172,18,2],[196,20,2],[242,24,2],[292,30,2],[346,18,4]];   /* per version: codewords in all, error-correction codewords a block, blocks */
+var DP_QR_ALIGN=[null,[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50]];
+var DP_QR_GF=(function(){ var exp=[],log=[],x=1; for(var i=0;i<255;i++){ exp[i]=x; log[x]=i; x<<=1; if(x&256)x^=0x11d; } for(i=255;i<512;i++)exp[i]=exp[i-255]; return {exp:exp,log:log}; })();
+function dpQrMul(a,b){ return a&&b?DP_QR_GF.exp[DP_QR_GF.log[a]+DP_QR_GF.log[b]]:0; }
+/* Reed-Solomon: the remainder of the data over the generator of that many roots */
+function dpQrRs(data, n){
+  var g=[1],i,j; for(i=0;i<n;i++){ var ng=[]; for(j=0;j<=g.length;j++)ng[j]=0; for(j=0;j<g.length;j++){ ng[j]^=g[j]; ng[j+1]^=dpQrMul(g[j],DP_QR_GF.exp[i]); } g=ng; }
+  var r=[]; for(i=0;i<n;i++)r[i]=0;
+  data.forEach(function(d){ var f=d^r[0]; r.shift(); r.push(0); for(j=0;j<n;j++)r[j]^=dpQrMul(g[j+1],f); });
+  return r;
+}
+/* the smallest version that holds the bytes, and its codewords: data padded out, split into blocks, each with its correction, interleaved */
+function dpQrCodewords(bytes){
+  var v,t,nData; for(v=1;v<=10;v++){ t=DP_QR_L[v]; nData=t[0]-t[1]*t[2]; if(bytes.length<=nData-(v<10?2:3))break; }
+  if(v>10)return null;
+  var bits=[],i,j, put=function(val,n){ for(var k=n-1;k>=0;k--)bits.push((val>>k)&1); };
+  put(4,4); put(bytes.length,v<10?8:16); bytes.forEach(function(b){ put(b,8); });
+  for(i=0;i<4&&bits.length<nData*8;i++)bits.push(0);
+  while(bits.length%8)bits.push(0);
+  var data=[]; for(i=0;i<bits.length;i+=8){ var x=0; for(j=0;j<8;j++)x=x<<1|bits[i+j]; data.push(x); }
+  for(i=0;data.length<nData;i++)data.push(i%2?0x11:0xEC);
+  var nb=t[2], small=Math.floor(nData/nb), long=nData%nb, blocks=[], at=0;
+  for(i=0;i<nb;i++){ var len=small+(i>=nb-long?1:0), d=data.slice(at,at+len); at+=len; blocks.push({d:d,e:dpQrRs(d,t[1])}); }
+  var out=[]; for(i=0;i<=small;i++)blocks.forEach(function(b){ if(i<b.d.length)out.push(b.d[i]); });
+  for(i=0;i<t[1];i++)blocks.forEach(function(b){ out.push(b.e[i]); });
+  return {version:v,words:out};
+}
+var DP_QR_MASKS=[function(r,c){ return (r+c)%2===0; },function(r){ return r%2===0; },function(r,c){ return c%3===0; },function(r,c){ return (r+c)%3===0; },
+  function(r,c){ return (Math.floor(r/2)+Math.floor(c/3))%2===0; },function(r,c){ return (r*c)%2+(r*c)%3===0; },function(r,c){ return ((r*c)%2+(r*c)%3)%2===0; },function(r,c){ return ((r+c)%2+(r*c)%3)%2===0; }];
+/* how hard a matrix is to read, by the standard's four rules; the mask with the least is the one drawn */
+function dpQrPenalty(m){
+  var n=m.length,p=0,r,c,k,dark=0, line=function(get){ var run=1,s=''; for(var i=0;i<n;i++){ var v=get(i); s+=v?'1':'0'; if(i&&v===get(i-1)){ run++; if(run===5)p+=3; else if(run>5)p++; } else run=1; }
+    for(var at=s.indexOf('10111010000');at>=0;at=s.indexOf('10111010000',at+1))p+=40; for(at=s.indexOf('00001011101');at>=0;at=s.indexOf('00001011101',at+1))p+=40; };
+  for(r=0;r<n;r++){ line(function(i){ return m[r][i]; }); line(function(i){ return m[i][r]; }); }
+  for(r=0;r<n-1;r++)for(c=0;c<n-1;c++){ k=m[r][c]; if(k===m[r][c+1]&&k===m[r+1][c]&&k===m[r+1][c+1])p+=3; }
+  for(r=0;r<n;r++)for(c=0;c<n;c++)dark+=m[r][c];
+  return p+Math.floor(Math.abs(dark*20-n*n*10)/(n*n))*10;
+}
+/* The matrix for a text: rows of 0 and 1, or null when the text is too long for version 10. */
+function dpQr(text){
+  var cw=dpQrCodewords(Array.prototype.slice.call(new TextEncoder().encode(String(text)))); if(!cw)return null;
+  var v=cw.version, n=17+4*v, m=[], fixed=[], r, c, i;
+  for(r=0;r<n;r++){ m[r]=[]; fixed[r]=[]; for(c=0;c<n;c++){ m[r][c]=0; fixed[r][c]=0; } }
+  var set=function(row,col,dark){ if(row<0||col<0||row>=n||col>=n)return; m[row][col]=dark?1:0; fixed[row][col]=1; };
+  var finder=function(r0,c0){ for(var dr=-1;dr<=7;dr++)for(var dc=-1;dc<=7;dc++){ var e=Math.max(Math.abs(dr-3),Math.abs(dc-3)); set(r0+dr,c0+dc,e!==2&&e<4); } };
+  finder(0,0); finder(0,n-7); finder(n-7,0);
+  for(i=8;i<n-8;i++){ set(6,i,i%2===0); set(i,6,i%2===0); }
+  var al=DP_QR_ALIGN[v], last=al.length-1;
+  al.forEach(function(ar,a){ al.forEach(function(ac,b){ if(a===0&&b===0||a===0&&b===last||a===last&&b===0)return;
+    for(var dr=-2;dr<=2;dr++)for(var dc=-2;dc<=2;dc++)set(ar+dr,ac+dc,Math.max(Math.abs(dr),Math.abs(dc))!==1); }); });
+  /* the format and version areas are kept clear of data now and written once the mask is known */
+  var format=function(mask){ var d=1<<3|mask, rem=d, k; for(k=0;k<10;k++)rem=(rem<<1)^((rem>>>9)*0x537); var bits=(d<<10|rem)^0x5412, bit=function(j){ return (bits>>>j)&1; };
+    for(k=0;k<=5;k++)set(k,8,bit(k)); set(7,8,bit(6)); set(8,8,bit(7)); set(8,7,bit(8)); for(k=9;k<15;k++)set(8,14-k,bit(k));
+    for(k=0;k<8;k++)set(8,n-1-k,bit(k)); for(k=8;k<15;k++)set(n-15+k,8,bit(k)); set(n-8,8,1); };
+  format(0);
+  if(v>=7){ var rem=v; for(i=0;i<12;i++)rem=(rem<<1)^((rem>>>11)*0x1F25); var vb=v<<12|rem;
+    for(i=0;i<18;i++){ var a=n-11+i%3, b=Math.floor(i/3), on=(vb>>>i)&1; set(b,a,on); set(a,b,on); } }
+  /* the codewords, two columns at a time from the right, up then down, round whatever is fixed */
+  var bitAt=0, total=cw.words.length*8, up=true, data=[];
+  for(c=n-1;c>0;c-=2){ if(c===6)c--;
+    for(i=0;i<n;i++){ r=up?n-1-i:i; for(var k=0;k<2;k++){ var cc=c-k; if(fixed[r][cc])continue; m[r][cc]=bitAt<total?(cw.words[bitAt>>3]>>(7-(bitAt&7)))&1:0; bitAt++; data.push([r,cc]); } }
+    up=!up; }
+  var best=null, bestP=Infinity, bestMask=0;
+  DP_QR_MASKS.forEach(function(fn,mask){ var t=m.map(function(row){ return row.slice(); }); data.forEach(function(p){ if(fn(p[0],p[1]))t[p[0]][p[1]]^=1; });
+    var keep=m; m=t; format(mask); m=keep; var p=dpQrPenalty(t); if(p<bestP){ bestP=p; best=t; bestMask=mask; } });
+  return {size:n,version:v,mask:bestMask,rows:best};
+}
+/* the code as one SVG path, dark on white with the four clear modules a reader needs round it */
+function dpQrSvg(q, px){
+  var n=q.size, d='', r, c;
+  for(r=0;r<n;r++)for(c=0;c<n;c++){ if(!q.rows[r][c])continue; var e=c; while(e+1<n&&q.rows[r][e+1])e++; d+='M'+(c+4)+' '+(r+4)+'h'+(e-c+1)+'v1h-'+(e-c+1)+'z'; c=e; }
+  var NS='http://www.w3.org/2000/svg', svg=document.createElementNS(NS,'svg'), bg=document.createElementNS(NS,'rect'), p=document.createElementNS(NS,'path');
+  svg.setAttribute('viewBox','0 0 '+(n+8)+' '+(n+8)); svg.setAttribute('width',px); svg.setAttribute('height',px); svg.setAttribute('shape-rendering','crispEdges'); svg.setAttribute('role','img'); svg.setAttribute('aria-label','QR code');
+  bg.setAttribute('width',n+8); bg.setAttribute('height',n+8); bg.setAttribute('fill','#fff'); p.setAttribute('d',d); p.setAttribute('fill','#000'); svg.appendChild(bg); svg.appendChild(p);
+  return svg;
+}
+
+</script>
+<script>
+/* Dispatch: a second device. The page has no server, so nothing about the owner's setup follows
+   them from one browser to the next: a phone that has never been told the Google client ID shows
+   the first-visit screen, as if its owner were new. This carries the one thing a second device
+   needs, the client ID (which is not a secret: Google prints it in every sign-in address), in
+   the page's own address: <page>#setup=<client id>&as=<the account>. "Set up another device" in
+   Options shows that address as a link and as a QR code (qr.js); the device that opens it keeps
+   the ID and asks for the one sign-in with Google. Nothing secret travels: not the token, not
+   the Anthropic key, not the mail. */
+var DP_CLIENT_RE=/^[\w-]+(\.[\w-]+)*\.apps\.googleusercontent\.com$/;
+function dpSetupLink(base, clientId, email){ return base+'#setup='+encodeURIComponent(clientId)+(email?'&as='+encodeURIComponent(email):''); }
+/* the fragment read back, pure: a client ID that looks like one, and the account to offer Google, or null */
+function dpSetupParse(hash){
+  var m=/^#?setup=([^&]*)(?:&as=([^&]*))?$/.exec(String(hash||'')); if(!m)return null;
+  var id,as; try{ id=decodeURIComponent(m[1]); as=m[2]?decodeURIComponent(m[2]):''; }catch(e){ return null; }
+  if(!DP_CLIENT_RE.test(id))return null;
+  return {clientId:id,hint:/^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']+$/.test(as)?as:''};
+}
+/* At boot, before the router sees the address. The link only ever fills an EMPTY setup: a device
+   that already has a client ID keeps its own, so a link from somewhere else cannot swap the
+   Google project a signed-in page talks through. Returns what happened, for the screen that follows. */
+function dpSetupArrive(){
+  if(!/^#setup=/.test(location.hash))return '';
+  var got=dpSetupParse(location.hash);
+  try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){ location.hash=''; }
+  if(!got)return 'bad';
+  var cfg=dpAuthConfig(); if(cfg.clientId)return cfg.clientId===got.clientId?'same':'kept';
+  dpSetAuthConfig({clientId:got.clientId,hint:got.hint}); return 'new';
+}
+function dpDeviceDialog(){
+  var cfg=dpAuthConfig(); if(!cfg.clientId)return;
+  var me=DP.me||{}, link=dpSetupLink(dpRedirectUri(),cfg.clientId,me.email), q=dpQr(link), box;
+  var field=dpEl('input.dp-devlink',{type:'text',readOnly:true,value:link,'aria-label':'Setup link',onfocus:function(e){ e.target.select(); }});
+  var copy=function(){ var done=function(){ dpToast('Link copied.'); };
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(link).then(done,function(){ field.focus(); field.select(); });
+    else{ field.focus(); field.select(); try{ if(document.execCommand('copy'))done(); }catch(e){} } };
+  var acts=[dpEl('button.dp-btn.primary',{type:'button',text:'Copy link',onclick:copy})];
+  if(navigator.share)acts.push(dpEl('button.dp-btn',{type:'button',text:'Share…',onclick:function(){ navigator.share({title:'Dispatch',url:link}).catch(function(){}); }}));
+  if(me.email)acts.push(dpEl('button.dp-btn',{type:'button',text:'Email it to me',onclick:function(){ box.close();
+    dpCompose({to:[{name:me.name||'',email:me.email}],subject:'Dispatch on another device',html:'<div>Open this on the other device to set up Dispatch there:</div><div><br></div><div><a href="'+dpEsc(link)+'">'+dpEsc(link)+'</a></div><div><br></div>'}); }}));
+  box=dpDialog('Set up another device',dpEl('div.dp-dev',[
+    q?dpEl('div.dp-devqr',[dpQrSvg(q,188)]):null,
+    dpEl('div.dp-devtext',[
+      dpEl('p',{text:q?'Point the other device’s camera at the code, or open this link there:':'Open this link on the other device:'}),
+      field, dpEl('div.dp-cacts',acts),
+      dpEl('p.dp-dim',{text:'It carries your Google client ID and nothing else. A client ID is not a secret; you still sign in with Google on the other device, and your Claude key stays here (paste it there under Options › Claude if you want Claude on it).'})])]),{wide:true});
+}
+/* the Inbox's unread count on the app's icon, where the device draws one for an installed page (an iPhone does once notifications are allowed) */
+function dpBadge(n){ try{ if(!navigator.setAppBadge)return; var p=n>0?navigator.setAppBadge(n):navigator.clearAppBadge(); if(p&&p.catch)p.catch(function(){}); }catch(e){} }
+
+</script>
+<script>
 /* Dispatch: the setup screen (the one-time OAuth client id), the sign-in screen, and the File
    tab's backstage - Account Information and Options, the way classic Outlook keeps them behind
    File. The setup screen is the only page a first visitor sees, so it carries the whole recipe
@@ -4383,26 +4588,34 @@ async function dpAiRecap(){
 function dpShowOnly(id){ ['dpSetup','dpSignin','dpApp'].forEach(function(k){ var el=dpQ('#'+k); if(el)el.hidden=k!==id; }); }
 function dpShowSetup(){
   dpShowOnly('dpSetup'); var host=dpQ('#dpSetup'); dpClear(host);
-  var cfg=dpAuthConfig(), idIn=dpEl('input',{type:'text',value:cfg.clientId||'',placeholder:'1234567890-abc.apps.googleusercontent.com',spellcheck:'false','aria-label':'OAuth client ID'});
+  var cfg=dpAuthConfig(), idIn=dpEl('input#dpClientId',{type:'text',value:cfg.clientId||'',placeholder:'1234567890-abc.apps.googleusercontent.com',spellcheck:'false',autocapitalize:'off',autocorrect:'off',autocomplete:'off','aria-label':'OAuth client ID'});
   var origin=location.origin, redirect=dpRedirectUri();
   var code=function(t){ return dpEl('code',{text:t}); };
   var step=function(n,title,kids){ return dpEl('li',[dpEl('b',{text:title}),dpEl('div',kids)]); };
+  var save=function(){ var id=idIn.value.trim(); if(!/\.apps\.googleusercontent\.com$/.test(id)){ dpToast('That does not look like a client ID (it ends in .apps.googleusercontent.com).'); idIn.focus(); return; }
+    dpSetAuthConfig(Object.assign(cfg,{clientId:id})); if(!dpAuthStart({consent:true}))dpToast('Could not start the sign-in.'); };
+  idIn.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); save(); } });
+  /* the box comes first: a second device already has a client ID to paste, and only a first visit needs the recipe under it,
+     which a phone (hardly ever where a Google Cloud project is made) keeps folded */
   host.appendChild(dpEl('div.dp-setup',[
     dpEl('div.dp-logo',[dpIcon('mail',28),dpEl('span',{text:'Dispatch'})]),
-    dpEl('h1',{text:'Your mail, calendar, people and tasks — from your own Gmail, in a page that is yours.'}),
-    dpEl('p',{text:'Dispatch talks to Google directly from this browser. There is no server in between and nothing of yours passes through anyone else, which is also why Google needs to be told, once, that this page may ask you to sign in. That takes a free Google Cloud project and about five minutes.'}),
-    dpEl('ol.dp-steps',[
-      step(1,'Make a project',[dpEl('span',{text:'Open '}),dpEl('a',{href:'https://console.cloud.google.com/projectcreate',target:'_blank',rel:'noopener',text:'console.cloud.google.com'}),dpEl('span',{text:' and create a project (any name).'})]),
-      step(2,'Turn on four APIs',[dpEl('span',{text:'Under APIs & Services › Library, enable the '}),code('Gmail API'),', ',code('Google Calendar API'),', ',code('People API'),' and ',code('Tasks API'),'.']),
-      step(3,'The consent screen',[dpEl('span',{text:'APIs & Services › OAuth consent screen: External, your own name and email, and add your Gmail address as a test user. Publishing status can stay "Testing" — it is only you.'})]),
-      step(4,'A client ID',[dpEl('span',{text:'Credentials › Create credentials › OAuth client ID › Web application. Under Authorized JavaScript origins add '}),code(origin),dpEl('span',{text:' and under Authorized redirect URIs add '}),code(redirect),dpEl('span',{text:'. Copy the client ID it gives you.'})]),
-      step(5,'Paste it here',[idIn,dpEl('p.dp-dim',{text:'It is kept in this browser only. A client ID is not a secret; your Google password never comes anywhere near this page.'})])]),
-    dpEl('div.dp-cacts',[dpEl('button.dp-btn.primary',{type:'button',text:'Save and sign in with Google',onclick:function(){
-      var id=idIn.value.trim(); if(!/\.apps\.googleusercontent\.com$/.test(id)){ dpToast('That does not look like a client ID (it ends in .apps.googleusercontent.com).'); idIn.focus(); return; }
-      dpSetAuthConfig(Object.assign(cfg,{clientId:id})); if(!dpAuthStart({consent:true}))dpToast('Could not start the sign-in.'); }}),
-      cfg.clientId?dpEl('button.dp-btn',{type:'button',text:'Cancel',onclick:function(){ dpToken()?dpStart():dpShowSignin(); }}):null]),
+    dpEl('h1',{text:'Your mail, calendar, people and tasks \u2014 from your own Gmail, in a page that is yours.'}),
+    dpEl('p',{text:'Dispatch talks to Google directly from this browser. There is no server in between and nothing of yours passes through anyone else, which is also why each browser has to be told, once, which Google client ID to sign in through.'}),
+    dpEl('div.dp-have',[dpEl('label',{text:'Your Google client ID',for:'dpClientId'}),idIn,
+      dpEl('div.dp-cacts',[dpEl('button.dp-btn.primary',{type:'button',text:'Save and sign in with Google',onclick:save}),
+        cfg.clientId?dpEl('button.dp-btn',{type:'button',text:'Cancel',onclick:function(){ dpToken()?dpStart():dpShowSignin(); }}):null]),
+      dpEl('p.dp-dim',{text:'It is kept in this browser only. A client ID is not a secret; your Google password never comes anywhere near this page.'})]),
+    dpEl('div.dp-other',[dpIcon('phone',16),dpEl('div',[dpEl('b',{text:'Already use Dispatch on another device?'}),
+      dpEl('span',{text:' You do not need to set anything up again. There, open Options \u203a Account \u203a Set up another device, and scan its code or open its link here. Or copy the client ID from '}),
+      dpEl('a',{href:'https://console.cloud.google.com/auth/clients',target:'_blank',rel:'noopener',text:'Google Cloud \u203a Clients'}),dpEl('span',{text:' and paste it above. If this is a new address for the app, add '}),code(origin),dpEl('span',{text:' and '}),code(redirect),dpEl('span',{text:' to that client first (step 4 below).'})])]),
+    dpEl('details.dp-first',{open:!DP.narrow()},[dpEl('summary',{text:'No client ID yet? Make one in Google Cloud: four steps, free, about five minutes'}),
+      dpEl('ol.dp-steps',[
+        step(1,'Make a project',[dpEl('span',{text:'Open '}),dpEl('a',{href:'https://console.cloud.google.com/projectcreate',target:'_blank',rel:'noopener',text:'console.cloud.google.com'}),dpEl('span',{text:' and create a project (any name).'})]),
+        step(2,'Turn on four APIs',[dpEl('span',{text:'Under APIs & Services \u203a Library, enable the '}),code('Gmail API'),', ',code('Google Calendar API'),', ',code('People API'),' and ',code('Tasks API'),'.']),
+        step(3,'The consent screen',[dpEl('span',{text:'APIs & Services \u203a OAuth consent screen: External, your own name and email, and add your Gmail address as a test user. Publishing status can stay "Testing" \u2014 it is only you.'})]),
+        step(4,'A client ID',[dpEl('span',{text:'Credentials \u203a Create credentials \u203a OAuth client ID \u203a Web application. Under Authorized JavaScript origins add '}),code(origin),dpEl('span',{text:' and under Authorized redirect URIs add '}),code(redirect),dpEl('span',{text:'. Copy the client ID it gives you and paste it above.'})])])]),
     dpEl('p.dp-dim.dp-fine',{text:'Scopes asked for: read and send mail, labels and drafts, the signature, calendars and events, contacts, tasks. Nothing is deleted permanently from here except a folder you empty on purpose.'})]));
-  setTimeout(function(){ idIn.focus(); },0);
+  if(!DP.narrow())setTimeout(function(){ idIn.focus(); },0);   /* a phone's keyboard would cover the page the moment it opened */
 }
 function dpShowSignin(){
   dpShowOnly('dpSignin'); var host=dpQ('#dpSignin'); dpClear(host);
@@ -4410,6 +4623,7 @@ function dpShowSignin(){
   DP.authError=null;
   host.appendChild(dpEl('div.dp-setup.narrow',[dpEl('div.dp-logo',[dpIcon('mail',28),dpEl('span',{text:'Dispatch'})]),
     dpEl('h1',{text:'Sign in to your Gmail'}),why?dpEl('p.dp-warn',{text:why}):null,
+    DP.setupNote==='new'?dpEl('p.dp-okay',{text:'This device now has your client ID ('+String(dpAuthConfig().clientId).replace(/^(.{10}).*(.{24})$/,'$1\u2026$2')+'), brought over by the link. One sign-in with Google and it is ready.'}):null,
     dpEl('p',{text:'You will be sent to Google and straight back. While the app is in "Testing" in Google Cloud, Google shows a warning that it has not verified the app — it is your own project, so choose Continue.'}),
     dpEl('div.dp-cacts',[dpEl('button.dp-btn.primary',{type:'button',text:'Sign in with Google',onclick:function(){ if(!dpAuthStart({}))dpShowSetup(); }}),
       dpEl('button.dp-btn',{type:'button',text:'Use a different client ID',onclick:dpShowSetup})])]));
@@ -4465,7 +4679,7 @@ function dpRenderSettings(){
       row('Model',sel('ai',DP_AI_MODELS,olRenderRibbon),'Claude Fable 5.2 is the most capable and costs the most per use; Sonnet and Haiku are quicker and cheaper.'),
       chk('aiVoice','Draft in my own voice: send a few of my recent sent messages along as writing samples')]),
     sec('Account',[row('Signed in as',dpEl('span',{text:(DP.me&&(DP.me.name?DP.me.name+' <'+DP.me.email+'>':DP.me.email))||'…'})),row('Client ID',dpEl('span.dp-mono',{text:(cfg.clientId||'').replace(/^(.{10}).*(.{24})$/,'$1…$2')})),
-      dpEl('div.dp-cacts',[dpEl('button.dp-btn',{type:'button',text:'Change client ID',onclick:dpShowSetup}),dpEl('button.dp-btn',{type:'button',text:'Keyboard shortcuts',onclick:dpShowShortcuts})])])]);
+      dpEl('div.dp-cacts',[dpEl('button.dp-btn.primary',{type:'button',text:'Set up another device',onclick:dpDeviceDialog}),dpEl('button.dp-btn',{type:'button',text:'Change client ID',onclick:dpShowSetup}),dpEl('button.dp-btn',{type:'button',text:'Keyboard shortcuts',onclick:dpShowShortcuts})])])]);
 }
 function dpAskNotify(){ if(!('Notification' in window))return; if(Notification.permission==='default')Notification.requestPermission(); }
 
@@ -4473,7 +4687,7 @@ function dpAskNotify(){ if(!('Notification' in window))return; if(Notification.p
 <script>
 /* Dispatch: the state, the boot and the router. Everything before this file defines functions;
    this one holds the one state object they share and runs. */
-var DP_BUILD='1e04a5c';
+var DP_BUILD='5bf9ee7';
 var DP={threads:{},msgs:{},lists:{},labels:[],sendAs:[],me:null,meSet:{},historyId:null,view:{mod:'mail',label:'INBOX',q:'',thread:null,msg:null,unread:false},sel:{},cursor:null,drag:null,
   syncing:false,loading:false,ready:false,authError:null,imgOk:{},cidCache:{},lastSync:0,lastChange:0,hashSelf:'',chord:'',ribbonTab:'home',fold:{cats:true,imap:true},expanded:{},searchScope:'mailbox',offline:false,
   people:{q:'',sel:null,editing:false},tasks:{lists:[],listId:null,items:[],showDone:false,open:null,loading:false},
@@ -4482,6 +4696,7 @@ DP.narrow=function(){ return window.matchMedia('(max-width: 760px)').matches; };
 
 function dpBoot(){
   dpLookMigrate(); dkInit(); dpApplyTheme();
+  DP.setupNote=dpSetupArrive();   /* a link from the owner's other device (device.js), before anything reads the address */
   dpAuthHandleRedirect();
   var cfg=dpAuthConfig();
   if(!cfg.clientId){ dpShowSetup(); return; }
@@ -4524,6 +4739,7 @@ async function dpStart(){
   dpComposeRestore();
   dpCheckBuild(); setInterval(dpCheckBuild,600000);
   dpScanLoad().then(function(){ if(DP.view.mod==='dashboard')dpRenderDashboard(); if(dpScanStale())setTimeout(function(){ dpScanMailbox({quiet:true}); },4000); });
+  if(DP.setupNote==='kept')dpToast('This device is already set up, so the link\u2019s client ID was not used.',{ms:7000});
   DP.ready=true; try{ window.__dpReady=true; }catch(e){}
 }
 function dpMeSet(){ var s={}; if(DP.me&&DP.me.email)s[String(DP.me.email).toLowerCase()]=1; (DP.sendAs||[]).forEach(function(a){ if(a.sendAsEmail)s[String(a.sendAsEmail).toLowerCase()]=1; }); DP.meSet=s; }
@@ -4560,6 +4776,8 @@ function dpShowModule(mod){
 }
 function dpRoute(){
   if(DP.hashSelf&&location.hash===DP.hashSelf){ DP.hashSelf=''; return; } DP.hashSelf='';
+  /* a setup link pasted into a tab that is already open is an address change, not a load: start again, so the boot reads it (device.js) */
+  if(/^#setup=/.test(location.hash)){ location.reload(); return; }
   var parts=location.hash.replace(/^#/,'').split('/').map(function(s){ try{ return decodeURIComponent(s); }catch(e){ return s; } }), mod=parts[0]||'mail';
   /* after the folder come the view's own words, in any order: the Focused Inbox's Other tab, the Unread filter */
   var flags=function(i){ var f={tab:'',unread:false}; for(;parts[i]==='other'||parts[i]==='unread';i++){ if(parts[i]==='other')f.tab='other'; else f.unread=true; } f.at=i; return f; };
@@ -4593,7 +4811,7 @@ document.addEventListener('DOMContentLoaded',function(){
   var sb=dpQ('#olSync'); if(sb)sb.onclick=function(){ dpSync(); };
   var sc=dpQ('#dpScrim'); if(sc)sc.onclick=function(){ document.body.classList.remove('side-open'); };
   var nm=dpQ('#olNavMore'); if(nm)nm.onclick=function(e){ dpMenu(e.currentTarget,[{label:'Dispatch Today (dashboard)',icon:'dash',run:function(){ location.hash='#dashboard'; }},{label:'Options…',icon:'settings',run:function(){ location.hash='#settings'; }},{label:'Keyboard shortcuts',icon:'list',run:dpShowShortcuts}]); };
-  olTellInit();
+  olTellInit(); dpSwipeInit();
   /* a message held for Undo Send has not left yet: say so before the page does */
   window.addEventListener('beforeunload',function(e){ if(dpSendsPending()){ e.preventDefault(); e.returnValue=''; } });
   dpBoot();
