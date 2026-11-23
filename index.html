@@ -1318,7 +1318,7 @@ html[data-own][data-theme="dark"] .ol-fl.on{background:var(--ol-ink);color:#1517
 <div id="dpToast" role="status" aria-live="polite"></div>
 
 <script>
-/* Dispatch - build 62b1a9a
+/* Dispatch - build 8b74870
    This file is a GENERATED ARTIFACT assembled by build.py from src/dispatch/. Do not edit it by
    hand; edit the source modules and rebuild. Module order: helpers, the wire format, sign-in,
    the APIs, the cache, triage, Claude's one way in (ai.js), then the modules, and app.js last,
@@ -1940,10 +1940,12 @@ function dpSession(k,v){ try{ if(v===undefined)return sessionStorage.getItem(k);
    renewed in one hop when the Google session is alive, and comes straight back with an error
    when it is not, which puts the sign-in screen up instead. Whatever was open - the route, the
    compose windows - is kept for the page that comes back. */
+/* the sign-in's state, which the answer from Google must carry back: 128 bits from the browser's own random source, not Math.random */
+function dpAuthState(){ var b=new Uint8Array(16); crypto.getRandomValues(b); return Array.prototype.map.call(b,function(x){ return (x<16?'0':'')+x.toString(16); }).join(''); }
 function dpAuthStart(opts){
   opts=opts||{};
   var cfg=dpAuthConfig(); if(!cfg.clientId)return false;
-  var state=Math.random().toString(36).slice(2)+Date.now().toString(36);
+  var state=dpAuthState();
   if(typeof dpComposeBackup==='function')dpComposeBackup();
   dpSession('dp.oauth',JSON.stringify({state:state,back:location.hash,silent:!!opts.silent,at:Date.now()}));
   location.assign(dpAuthUrl(cfg.clientId,dpRedirectUri(),state,{prompt:opts.silent?'none':(opts.consent?'consent':''),hint:cfg.hint||''}));
@@ -2010,11 +2012,14 @@ async function dpFetch(url, opts){
     if(opts.json!==undefined)h['Content-Type']='application/json';
     if(opts.type)h['Content-Type']=opts.type;
     var method=opts.method||(opts.json!==undefined||opts.body?'POST':'GET'), r;
+    /* a lost answer or a 5xx may come after Google DID act, so only a call that is harmless twice goes again: a send, a draft, an event or a
+       contact created twice is not. A 429 (and a 403 for quota) was refused before anything happened, so that one waits and goes again whatever it is. */
+    var again=opts.idem||/^(GET|HEAD|PUT|PATCH|DELETE)$/.test(method);
     try{ r=await fetch(url,{method:method,headers:h,body:opts.json!==undefined?JSON.stringify(opts.json):opts.body,signal:opts.signal}); }
     catch(e){ if(e&&e.name==='AbortError')throw e;
-      if(attempt<2){ attempt++; await dpSleep(600*attempt); continue; } throw new DpApiError(0,'No connection: '+(e&&e.message||e)); }
+      if(again&&attempt<2){ attempt++; await dpSleep(600*attempt); continue; } throw new DpApiError(0,'No connection: '+(e&&e.message||e)); }
     if(r.status===401){ dpAuthRenew(); throw new DpApiError(401,'Your sign-in has expired'); }
-    if((r.status===429||r.status===403&&/rate|quota/i.test(await r.clone().text())||r.status>=500)&&attempt<4){
+    if((r.status===429||r.status===403&&/rate|quota/i.test(await r.clone().text())||again&&r.status>=500)&&attempt<4){
       attempt++; var ra=+(r.headers.get('Retry-After')||0);
       await dpSleep(ra?ra*1000:Math.min(8000,400*Math.pow(2,attempt))+Math.random()*250); continue; }
     if(r.status===204)return null;
@@ -2047,10 +2052,10 @@ function dpGmLabelCreate(name){ return dpGmail('labels',null,{json:{name:name,la
 function dpGmThreadsList(p){ return dpGmail('threads',p); }
 function dpGmThreadMeta(id){ return dpGmail('threads/'+id,{format:'metadata',metadataHeaders:['From','To','Subject','Date']}); }
 function dpGmThreadFull(id){ return dpGmail('threads/'+id,{format:'full'}); }
-function dpGmModifyThread(id,add,remove){ return dpGmail('threads/'+id+'/modify',null,{json:{addLabelIds:add||[],removeLabelIds:remove||[]}}); }
-function dpGmModifyMessage(id,add,remove){ return dpGmail('messages/'+id+'/modify',null,{json:{addLabelIds:add||[],removeLabelIds:remove||[]}}); }
-function dpGmTrashThread(id){ return dpGmail('threads/'+id+'/trash',null,{method:'POST'}); }
-function dpGmUntrashThread(id){ return dpGmail('threads/'+id+'/untrash',null,{method:'POST'}); }
+function dpGmModifyThread(id,add,remove){ return dpGmail('threads/'+id+'/modify',null,{json:{addLabelIds:add||[],removeLabelIds:remove||[]},idem:true}); }
+function dpGmModifyMessage(id,add,remove){ return dpGmail('messages/'+id+'/modify',null,{json:{addLabelIds:add||[],removeLabelIds:remove||[]},idem:true}); }
+function dpGmTrashThread(id){ return dpGmail('threads/'+id+'/trash',null,{method:'POST',idem:true}); }
+function dpGmUntrashThread(id){ return dpGmail('threads/'+id+'/untrash',null,{method:'POST',idem:true}); }
 function dpGmDeleteThread(id){ return dpGmail('threads/'+id,null,{method:'DELETE'}); }
 function dpGmAttachment(msgId,attId){ return dpGmail('messages/'+msgId+'/attachments/'+attId); }
 function dpGmHistory(start,pageToken){ return dpGmail('history',{startHistoryId:start,pageToken:pageToken,maxResults:500}); }
@@ -4757,7 +4762,7 @@ function dpAskNotify(){ if(!('Notification' in window))return; if(Notification.p
 <script>
 /* Dispatch: the state, the boot and the router. Everything before this file defines functions;
    this one holds the one state object they share and runs. */
-var DP_BUILD='62b1a9a';
+var DP_BUILD='8b74870';
 var DP={threads:{},msgs:{},lists:{},labels:[],sendAs:[],me:null,meSet:{},historyId:null,view:{mod:'mail',label:'INBOX',q:'',thread:null,msg:null,unread:false},sel:{},cursor:null,drag:null,
   syncing:false,loading:false,ready:false,authError:null,imgOk:{},cidCache:{},lastSync:0,lastChange:0,hashSelf:'',chord:'',ribbonTab:'home',fold:{cats:true,imap:true},expanded:{},searchScope:'mailbox',offline:false,
   people:{q:'',sel:null,editing:false},tasks:{lists:[],listId:null,items:[],showDone:false,open:null,loading:false},
