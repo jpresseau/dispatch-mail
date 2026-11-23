@@ -2,6 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<!-- The page's own policy, before anything runs. A script runs only if this page shipped it (build.py writes the hash of
+     each inline script in place of the token); the page talks only to Google's four APIs and Anthropic; nothing may
+     embed a plugin or rewrite the base. Pictures may come from anywhere because a message the owner allows pictures
+     for shows them (the reading frame keeps its own stricter policy, safehtml.js), and forms and frames may go to any
+     https address because one-click unsubscribe posts to the sender's own (infobar.js). -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'sha256-LAP5rwSsHMbr+PRQ4/S0BBC9bWuRGZVdp9143ot2hBY=' 'sha256-F+V8Cnb106qqQg9yM9P6XxFXngJqZVlIe/cN81zX1X4=' 'sha256-cYIQomX0z6IZDcVGXCL8t0sYOgv51HYxypLvFDvAg6A=' 'sha256-JHRw/W4MQoNEok/ra4Z9drldlIOs+iumyc0RMdPP6nk=' 'sha256-FxTOVcOU2lAQMg7ZAbAvgTl7xVpvmDHRWglFse/bQ7U=' 'sha256-npVFoNMXjpP1Y3AgQMA3zQHg0hSY6wBiSrsUD6BVer4=' 'sha256-kyuE36T/5ECWQZ/PS7j5ZCLqUcTxuy8x8XtpM4OuWqw=' 'sha256-9IPR81I5XUKncjry/92sfiFme5bT9LRQC/KmuE/1uFs=' 'sha256-h+GePUa0aQwyk7KSeatDH9j9THak/uBi/RT76+BDuxQ=' 'sha256-Mv6k64WUNQqQd6m5UN+ZOTpoGhiWvRqgZnuRL9XWuuI=' 'sha256-8F5my95VmalRkZjWvucef4EMTlMYYs4+Ig6RjYjkdbw=' 'sha256-4hBUTu6NJinLOWe/3z/HVvI0B3FknnGjbH+TOVQovkM=' 'sha256-tIAH+GMmpQ6YbrX1+S5Gs1zqSP6fRsa930gMgC2BCBs=' 'sha256-Fs+2zgep4/AJZJf4MsdVI/LKHPNN6MDn5sPV2HzVxi8=' 'sha256-PLRL/XIoWHgzQe/BPVFClJYEWjPBPiapWDwRSKRVv9g=' 'sha256-xjLLx75XflYx2Hgj+lEicVzDWwoErjg2B4YdjIrrJ4E=' 'sha256-NpRuFkiigUNMpNpb5nHCvUT5dibJTjODkIwTCTumuPk=' 'sha256-3xlsOFb8BS8gXdRD1lfrfvE8sBGyvd33xGL9f5LNW/8=' 'sha256-1dCSCkY/jrIhx6daflR1IJjcUX7jQ+NFQJgJ+nwIX6E=' 'sha256-S+I31ChQX5tXwBu7kdqNFx0tb/opPGzxUNAYxqqtnm8=' 'sha256-bVl3dUvXG7qW3I8JK7y7S4mnqD+UubdTZKp2IaPppIg=' 'sha256-+eAwBqItubyUMCgNuoxgC/9pu3yJPGwbKoxcHwNtYYA=' 'sha256-rs586pN90sQA8Ogw9KADpAod30xp3rWdRd/rs4GgYnI=' 'sha256-ZxfhVoNUBjQGmsGQS6IKvKlerRRTWSsBzBFFZb4xCG8=' 'sha256-iAoPfNZqT7cRuRBqHWBeOegrXQ5U6uJsEsmZ0OlPfhM=' 'sha256-HlXZw9S8Q5vkzTbyv03FKhlkPVPqjgsdWgSjy6i2kuo=' 'sha256-/Xi+iwfzYcnhr1gZGbnyqj1n+OFEJzF1Emtgv5BHZpc=' 'sha256-qD2OWMTB3Z1kG0+0XIgPuTWpaoywS2ZapnpHexD+Pcs=' 'sha256-icGQi16iXbzivjqHtyEs44FiEfsLwTBGHQ66JFroCVU=' 'sha256-npylxfcZ+Hoy4lK6DMzAZ/KMzExfvOXaFUlT2wipTt8=' 'sha256-1itwSfSDiWjV7h7z+4KkubUjM/XGmW8oy3jSv0SMZCM=' 'sha256-GPtXXWT8HuKLYfXx7z6eJ9NONs79ANfwrQ1HH2/OFU8=' 'sha256-HqmWzizf7zha9r75WfOf4YGW8fzgRZ1hSBOr33coUdg=' 'sha256-K/fG7tcMilaeeidhLHuSjH4bTQ/lDkC1gYZfO58NO3Q=' 'sha256-nqAMml6TNxTU3/BbDf7rGQN3HhXpMUXEaVNMYXgtghc=' 'sha256-BU75pSQs+DxPy6qOt1PpM2d3mNLrw/sOF296b3pltpQ=' 'sha256-iAv+gl33dtc/hZYpM2CBPEWYlNbFZpgip3e4Qdxu62Y='; style-src 'self' 'unsafe-inline'; img-src * data: blob:; font-src 'self' data:; connect-src 'self' https://gmail.googleapis.com https://www.googleapis.com https://people.googleapis.com https://tasks.googleapis.com https://oauth2.googleapis.com https://api.anthropic.com; frame-src 'self' https:; worker-src 'self'; manifest-src 'self'; media-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self' https:">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Dispatch</title>
 <meta name="description" content="Dispatch: mail, calendar, people and tasks for one Gmail account, laid out like classic Outlook, from a single page of your own.">
@@ -1318,7 +1324,7 @@ html[data-own][data-theme="dark"] .ol-fl.on{background:var(--ol-ink);color:#1517
 <div id="dpToast" role="status" aria-live="polite"></div>
 
 <script>
-/* Dispatch - build 8b74870
+/* Dispatch - build 1c4c85e
    This file is a GENERATED ARTIFACT assembled by build.py from src/dispatch/. Do not edit it by
    hand; edit the source modules and rebuild. Module order: helpers, the wire format, sign-in,
    the APIs, the cache, triage, Claude's one way in (ai.js), then the modules, and app.js last,
@@ -3469,12 +3475,22 @@ function dpUnsubParse(h, post){
   return out;
 }
 function dpUnsubDone(email){ try{ return (JSON.parse(localStorage.getItem('dp.unsub')||'{}')||{})[String(email||'').toLowerCase()]||0; }catch(e){ return 0; } }
+/* RFC 8058's one-click POST, as a form into a hidden frame that runs nothing: the page's policy lets fetch reach only Google and
+   Anthropic, and the sender's server is neither. The body is exactly List-Unsubscribe=One-Click, form-encoded, as the RFC asks. */
+function dpUnsubPost(url){
+  return new Promise(function(done){
+    var name='dpUnsub'+Date.now().toString(36), fr=dpEl('iframe',{name:name,sandbox:'',title:'',hidden:true,'aria-hidden':'true'});
+    var f=dpEl('form',{method:'POST',action:url,target:name,enctype:'application/x-www-form-urlencoded',hidden:true},[dpEl('input',{type:'hidden',name:'List-Unsubscribe',value:'One-Click'})]);
+    var fin=function(){ setTimeout(function(){ fr.remove(); f.remove(); },60000); done(); };
+    fr.addEventListener('load',fin); setTimeout(fin,8000);
+    document.body.appendChild(fr); document.body.appendChild(f); f.submit(); });
+}
 async function dpUnsubscribe(m){
   var u=dpUnsubParse(m.listUnsub,m.listUnsubPost), who=dpTriageOrg(m.from)||m.from.email;
   var how=u.oneClick?'Dispatch will tell '+who+'’s server to stop.':u.mailto?'Dispatch will send the unsubscribe email the sender asks for, to '+u.mailto.to+'.':'Their unsubscribe page will open in a new tab.';
   if(!confirm('Unsubscribe from '+who+'?\n\n'+how))return;
   try{
-    if(u.oneClick)await fetch(u.url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'List-Unsubscribe=One-Click'});
+    if(u.oneClick)await dpUnsubPost(u.url);
     else if(u.mailto){ var sa=DP.sendAs.find(function(s){ return s.isDefault; })||DP.sendAs[0]||{};
       await dpGmSendRaw(dpBuildMime({from:{name:sa.displayName||(DP.me&&DP.me.name)||'',email:sa.sendAsEmail||(DP.me&&DP.me.email)||''},to:[{name:'',email:u.mailto.to}],subject:u.mailto.subject,html:dpTextToHtml(u.mailto.body||'unsubscribe')})); }
     else window.open(u.url,'_blank','noopener');
@@ -4762,7 +4778,7 @@ function dpAskNotify(){ if(!('Notification' in window))return; if(Notification.p
 <script>
 /* Dispatch: the state, the boot and the router. Everything before this file defines functions;
    this one holds the one state object they share and runs. */
-var DP_BUILD='8b74870';
+var DP_BUILD='1c4c85e';
 var DP={threads:{},msgs:{},lists:{},labels:[],sendAs:[],me:null,meSet:{},historyId:null,view:{mod:'mail',label:'INBOX',q:'',thread:null,msg:null,unread:false},sel:{},cursor:null,drag:null,
   syncing:false,loading:false,ready:false,authError:null,imgOk:{},cidCache:{},lastSync:0,lastChange:0,hashSelf:'',chord:'',ribbonTab:'home',fold:{cats:true,imap:true},expanded:{},searchScope:'mailbox',offline:false,
   people:{q:'',sel:null,editing:false},tasks:{lists:[],listId:null,items:[],showDone:false,open:null,loading:false},
