@@ -1318,7 +1318,7 @@ html[data-own][data-theme="dark"] .ol-fl.on{background:var(--ol-ink);color:#1517
 <div id="dpToast" role="status" aria-live="polite"></div>
 
 <script>
-/* Dispatch - build 5bf9ee7
+/* Dispatch - build 62b1a9a
    This file is a GENERATED ARTIFACT assembled by build.py from src/dispatch/. Do not edit it by
    hand; edit the source modules and rebuild. Module order: helpers, the wire format, sign-in,
    the APIs, the cache, triage, Claude's one way in (ai.js), then the modules, and app.js last,
@@ -1814,6 +1814,81 @@ function dpUploadBody(meta, raw){
 
 </script>
 <script>
+/* Dispatch: mail's HTML, made safe for the two places it is shown. A message is written by
+   whoever sent it, so its HTML is hostile until shown otherwise.
+   - In the compose window (a quote, a forward, a draft) it sits in a contenteditable in THIS
+     document, the one that holds the Google token and the Claude key. dpSafeHtml rebuilds it from
+     an allowlist after parsing it with DOMParser, which runs nothing and loads nothing: no script
+     or style element, no event handler, no id or name (an element named __DP_API_BASE would
+     otherwise become window.__DP_API_BASE), no class (the app's own styles), no link that is not
+     http(s), mailto or tel, no position (an overlay over the app), no url() in a style, and no
+     picture from another server unless the owner allows that sender's pictures.
+   - In the reading pane it is drawn in a sandboxed frame that runs no script. dpMailDoc builds
+     that frame's document itself, the CSP first in a head of its own, with the message parsed and
+     put in the body: the policy is never spliced into the message's own text, where a comment or
+     an attribute could swallow it. Whether a message "has remote pictures" is asked of the parsed
+     document (src, srcset, background, poster, style and <style> urls), and only decides whether
+     the Download pictures bar is shown: what the frame may fetch is the owner's choice alone. */
+var DP_SAFE_DROP={SCRIPT:1,STYLE:1,LINK:1,META:1,BASE:1,IFRAME:1,FRAME:1,FRAMESET:1,OBJECT:1,EMBED:1,APPLET:1,FORM:1,INPUT:1,BUTTON:1,SELECT:1,TEXTAREA:1,OPTION:1,
+  SVG:1,MATH:1,TEMPLATE:1,NOSCRIPT:1,TITLE:1,HEAD:1,AUDIO:1,VIDEO:1,SOURCE:1,TRACK:1,CANVAS:1,PORTAL:1,DIALOG:1,XMP:1,PLAINTEXT:1,NOEMBED:1,NOFRAMES:1};
+var DP_SAFE_KEEP={A:1,ABBR:1,ADDRESS:1,ARTICLE:1,ASIDE:1,B:1,BDI:1,BDO:1,BIG:1,BLOCKQUOTE:1,BR:1,CAPTION:1,CENTER:1,CITE:1,CODE:1,COL:1,COLGROUP:1,DD:1,DEL:1,DFN:1,DIV:1,DL:1,DT:1,
+  EM:1,FIGCAPTION:1,FIGURE:1,FONT:1,FOOTER:1,H1:1,H2:1,H3:1,H4:1,H5:1,H6:1,HEADER:1,HR:1,I:1,IMG:1,INS:1,KBD:1,LI:1,MAIN:1,MARK:1,NAV:1,OL:1,P:1,PRE:1,Q:1,S:1,SAMP:1,SECTION:1,
+  SMALL:1,SPAN:1,STRIKE:1,STRONG:1,SUB:1,SUP:1,TABLE:1,TBODY:1,TD:1,TFOOT:1,TH:1,THEAD:1,TR:1,TT:1,U:1,UL:1,VAR:1,WBR:1};
+var DP_SAFE_ATTR={style:1,title:1,dir:1,lang:1,align:1,valign:1,width:1,height:1,bgcolor:1,color:1,face:1,size:1,border:1,cellpadding:1,cellspacing:1,colspan:1,rowspan:1,alt:1,start:1,type:1};
+/* is a URL one the page may fetch without asking: a picture carried in the message itself */
+function dpSafeInlineSrc(v){ return /^(data:image\/(png|gif|jpe?g|webp|bmp)[;,]|cid:)/i.test(v); }
+function dpSafeUrl(v){ return String(v==null?'':v).replace(/[\u0000- \u007f-\u009f]/g,''); }
+/* `own` is the compose window's door, where the app's own wrappers (the signature, the quote, the forward) keep the one class each that
+   drafting finds them by; a message's own HTML is cleaned before that with own unset, so it can bring no class at all */
+var DP_SAFE_CLASS={'dp-sig':1,'dp-quote':1,'dp-fwd':1};
+function dpSafeHtml(html, allowRemote, own){
+  var doc=new DOMParser().parseFromString('<!doctype html><body>'+String(html==null?'':html),'text/html');
+  var walk=function(parent){
+    Array.prototype.slice.call(parent.childNodes).forEach(function(n){
+      if(n.nodeType===3)return;
+      if(n.nodeType!==1){ parent.removeChild(n); return; }
+      var tag=String(n.nodeName).toUpperCase();
+      if(DP_SAFE_DROP[tag]||n.namespaceURI&&n.namespaceURI!=='http://www.w3.org/1999/xhtml'){ parent.removeChild(n); return; }
+      walk(n);
+      if(!DP_SAFE_KEEP[tag]){ while(n.firstChild)parent.insertBefore(n.firstChild,n); parent.removeChild(n); return; }
+      Array.prototype.slice.call(n.attributes).forEach(function(a){
+        var name=a.name.toLowerCase(), v=a.value, keep=!!DP_SAFE_ATTR[name]||!!own&&name==='class'&&!!DP_SAFE_CLASS[v];
+        if(name==='href'&&tag==='A')keep=/^(https?:|mailto:|tel:)/i.test(dpSafeUrl(v));
+        if(name==='src'&&tag==='IMG'){ var u=dpSafeUrl(v); keep=dpSafeInlineSrc(u)||!!allowRemote&&/^https?:\/\//i.test(u); }
+        if(!keep)n.removeAttribute(a.name); });
+      if(n.hasAttribute('style')){ n.style.removeProperty('position'); n.style.removeProperty('z-index');
+        var css=n.getAttribute('style')||''; if(/url\s*\(|expression\s*\(|@import|behaviou?r\s*:|-moz-binding|javascript:/i.test(css)||!css.trim())n.removeAttribute('style'); }
+      if(tag==='A'&&n.hasAttribute('href')){ n.setAttribute('target','_blank'); n.setAttribute('rel','noopener noreferrer'); }
+    });
+  };
+  walk(doc.body);
+  return doc.body.innerHTML;
+}
+/* the reading frame's document: our head, then the message as body content. {html, remote} */
+function dpMailDoc(html, allowImages){
+  var doc=new DOMParser().parseFromString(String(html==null?'':html),'text/html');
+  Array.prototype.slice.call(doc.querySelectorAll('meta,base,script,link,iframe,frame,object,embed,applet,portal,noscript')).forEach(function(n){ n.parentNode.removeChild(n); });
+  /* the frame runs no script whatever the message says (its sandbox has no allow-scripts); its handlers and script links go too, so none is even tried */
+  Array.prototype.slice.call(doc.querySelectorAll('*')).forEach(function(n){ Array.prototype.slice.call(n.attributes).forEach(function(at){
+    if(/^on/i.test(at.name)||/^(href|src|action|formaction|xlink:href)$/i.test(at.name)&&/^(javascript|vbscript):/i.test(dpSafeUrl(at.value)))n.removeAttribute(at.name); }); });
+  var away=function(v){ var u=dpSafeUrl(v); return !!u&&!dpSafeInlineSrc(u)&&!/^(#|about:blank$)/i.test(u); }, remote=false;
+  Array.prototype.slice.call(doc.querySelectorAll('[src],[srcset],[background],[poster],[style]')).forEach(function(n){
+    if(n.hasAttribute('src')&&away(n.getAttribute('src'))||n.hasAttribute('background')&&away(n.getAttribute('background'))||n.hasAttribute('poster')&&away(n.getAttribute('poster')))remote=true;
+    if(n.hasAttribute('srcset')&&String(n.getAttribute('srcset')).split(',').some(function(p){ return away(p.trim().split(/\s+/)[0]); }))remote=true;
+    if(n.hasAttribute('style')&&/url\s*\(\s*['"]?\s*(?!data:|cid:)[^)'"\s]/i.test(n.getAttribute('style')))remote=true; });
+  var styles=Array.prototype.slice.call(doc.querySelectorAll('style'));
+  if(styles.some(function(s){ return /url\s*\(\s*['"]?\s*(?!data:|cid:)[^)'"\s]|@import/i.test(s.textContent); }))remote=true;
+  /* the message's own styles come along into the body, where a style element still applies; nothing else of its head does */
+  var css=styles.map(function(s){ var t=s.textContent; s.parentNode.removeChild(s); return '<style>'+t.replace(/<\/style/gi,'<\\/style')+'</style>'; }).join('');
+  var csp="default-src 'none'; img-src "+(allowImages?"* data: blob:":"data:")+"; style-src 'unsafe-inline'; font-src 'none'; form-action 'none'; frame-src 'none'; media-src 'none'";
+  var head='<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="'+csp+'"><base target="_blank">'
+    +'<style>body{margin:0;padding:6px 2px;font:14px/1.45 Calibri,"Segoe UI",-apple-system,Roboto,Helvetica,Arial,sans-serif;color:#1b1b1b;overflow-wrap:anywhere}'
+    +'img{max-width:100%;height:auto}pre{white-space:pre-wrap}blockquote{margin:0 0 0 .8ex;border-left:1px solid #ccc;padding-left:1ex}table{max-width:100%}</style>';
+  return {html:'<!doctype html><html><head>'+head+'</head><body>'+css+doc.body.innerHTML+'</body></html>',remote:remote};
+}
+
+</script>
+<script>
 /* Dispatch: signing in. GitHub Pages is a static host, so there is nowhere to keep a client
    secret and no server to exchange a code: the app uses OAuth 2.0's implicit grant, a full-page
    trip to accounts.google.com that comes back with the access token in the URL fragment. A
@@ -1915,7 +1990,8 @@ function dpAuthSignOut(){
 var DP_API_REAL={gmail:'https://gmail.googleapis.com/gmail/v1/users/me/',upload:'https://gmail.googleapis.com/upload/gmail/v1/users/me/',
   cal:'https://www.googleapis.com/calendar/v3/',people:'https://people.googleapis.com/v1/',tasks:'https://tasks.googleapis.com/tasks/v1/',
   revoke:'https://oauth2.googleapis.com/revoke',auth:'https://accounts.google.com/o/oauth2/v2/auth',anthropic:'https://api.anthropic.com/'};
-function dpApiBase(k){ var o=null; try{ o=window.__DP_API_BASE; }catch(e){} return o?o+k+(/^(revoke|auth)$/.test(k)?'':'/'):DP_API_REAL[k]; }
+/* the test seam is a same-origin path and nothing else: an element in the page with id="__DP_API_BASE" is also window.__DP_API_BASE, and must never send the token anywhere */
+function dpApiBase(k){ var o=null; try{ o=window.__DP_API_BASE; }catch(e){} return typeof o==='string'&&/^\/__[a-z]+\/$/.test(o)?o+k+(/^(revoke|auth)$/.test(k)?'':'/'):DP_API_REAL[k]; }
 
 function DpApiError(status, message, body){ this.name='DpApiError'; this.status=status; this.message=message; this.body=body; }
 DpApiError.prototype=Object.create(Error.prototype);
@@ -3274,27 +3350,17 @@ async function dpDrawBody(body, m){
     var cids=Object.keys(m.inline||{});
     if(cids.length){ var got=await dpPool(cids,4,function(cid){ return dpCidData(m,cid); });
       cids.forEach(function(cid,i){ if(got[i]&&!got[i].error)html=html.split('cid:'+cid).join(got[i]); }); }
-    var remote=/<img[^>]+src\s*=\s*["']?\s*(?:https?:)?\/\//i.test(html)||/url\(\s*["']?\s*https?:/i.test(html);
+    var md=dpMailDoc(html,allow), remote=md.remote;   /* safehtml.js: built around the message, not spliced into it */
     if(remote&&!allow)body.appendChild(dpEl('div.dp-imgbar',[dpIcon('image',15),dpEl('span',{text:'Click here to download pictures. To help protect your privacy, Dispatch prevented automatic download of some pictures in this message.'}),
       dpEl('button.dp-link',{type:'button',text:'Download pictures',onclick:function(){ DP.imgOk[m.from.email]=1; dpDrawBody(body,m); }})]));
     var fr=dpEl('iframe.dp-frame',{sandbox:'allow-same-origin allow-popups allow-popups-to-escape-sandbox',title:'Message',scrolling:'no'});
-    fr.srcdoc=dpBodyDoc(html,allow||!remote);
+    fr.srcdoc=md.html;
     /* the frame as tall as what it holds. A document is never shorter than its frame, so the frame is let go to nothing before it
        is measured: measured as it stood, a two-line message sat in the 150px a frame starts at, and grew 8px with every measure */
     var size=function(){ try{ var d=fr.contentDocument; if(!d||!d.documentElement)return; fr.style.height='0px'; fr.style.height=Math.max(40,d.documentElement.scrollHeight+8)+'px'; }catch(e){} };
     fr.addEventListener('load',function(){ size(); try{ if(window.ResizeObserver&&fr.contentDocument.body)new ResizeObserver(size).observe(fr.contentDocument.body); }catch(e){} setTimeout(size,400); setTimeout(size,2000); });
     body.appendChild(fr);
   } else body.appendChild(dpEl('div.dp-plain',{html:dpLinkify(m.text||'')}));
-}
-function dpBodyDoc(html, allowImages){
-  var csp="default-src 'none'; img-src "+(allowImages?"* data: blob:":"data:")+"; style-src 'unsafe-inline'; font-src 'none'; form-action 'none'; frame-src 'none'";
-  html=String(html||'').replace(/<meta[^>]+http-equiv\s*=\s*["']?refresh[^>]*>/gi,'');
-  var head='<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="'+csp+'"><base target="_blank">'
-    +'<style>body{margin:0;padding:6px 2px;font:14px/1.45 Calibri,"Segoe UI",-apple-system,Roboto,Helvetica,Arial,sans-serif;color:#1b1b1b;overflow-wrap:anywhere}'
-    +'img{max-width:100%;height:auto}pre{white-space:pre-wrap}blockquote{margin:0 0 0 .8ex;border-left:1px solid #ccc;padding-left:1ex}table{max-width:100%}</style>';
-  if(/<head[\s>]/i.test(html))return html.replace(/<head([^>]*)>/i,'<head$1>'+head);
-  if(/<html[\s>]/i.test(html))return html.replace(/<html([^>]*)>/i,'<html$1><head>'+head+'</head>');
-  return '<!doctype html><html><head>'+head+'</head><body>'+html+'</body></html>';
 }
 /* plain text: escaped, links made, quoted lines dimmed */
 function dpLinkify(t){
@@ -3498,6 +3564,9 @@ function dpSuggest(q, have){
    dpComposeBackup also writes every open window to sessionStorage before the page leaves for
    Google, and dpComposeRestore puts them back when it returns. */
 var DP_CW={};
+/* a message quoted or forwarded: its body made safe first, and its pictures from elsewhere kept only if the owner lets that sender's pictures load */
+function dpComposeSafeMsg(m){ var p=dpPrefs(), allow=p.images==='always'||!!(DP.imgOk&&m.from&&DP.imgOk[m.from.email]);
+  return Object.assign({},m,{html:m.html?dpSafeHtml(m.html,allow):''}); }
 function dpSignatureHtml(fromEmail){
   var p=dpPrefs(), sa=DP.sendAs.find(function(s){ return s.sendAsEmail===fromEmail; })||{};
   var sig=String(p.signature!=null?p.signature:(sa.signature||'')).trim(); if(!sig)return '';
@@ -3512,9 +3581,9 @@ function dpCompose(o){
   if(m&&(w.mode==='reply'||w.mode==='replyAll')){
     var t=dpReplyTargets(m,DP.meSet,w.mode==='replyAll'); w.to=t.to; w.cc=t.cc; w.subject=dpReplySubject(m.subject);
     w.inReplyTo=m.messageId; w.references=((m.references||'')+' '+(m.messageId||'')).trim(); w.threadId=m.threadId;
-    w.html=(o.body||'<div><br></div>')+dpSignatureHtml(w.from)+dpQuoteHtml(m);
+    w.html=(o.body||'<div><br></div>')+dpSignatureHtml(w.from)+dpQuoteHtml(dpComposeSafeMsg(m));
   } else if(m&&w.mode==='forward'){
-    w.subject=dpReplySubject(m.subject,'forward'); w.html='<div><br></div>'+dpSignatureHtml(w.from)+dpForwardHtml(m);
+    w.subject=dpReplySubject(m.subject,'forward'); w.html='<div><br></div>'+dpSignatureHtml(w.from)+dpForwardHtml(dpComposeSafeMsg(m));
     w.atts=(m.atts||[]).filter(function(a){ return a.id; }).map(function(a){ return {name:a.name,mime:a.mime,size:a.size,src:{msgId:m.id,attId:a.id}}; });
   } else if(m&&w.mode==='draft'){
     w.to=m.to.slice(); w.cc=m.cc.slice(); w.bcc=m.bcc.slice(); w.subject=m.subject; w.threadId=m.threadId; w.inReplyTo=m.inReplyTo; w.references=m.references;
@@ -3543,7 +3612,8 @@ function dpComposeRender(w){
   f.appendChild(toRow); f.appendChild(ccRow); f.appendChild(bccRow);
   f.appendChild(dpEl('div.dp-cwrow',[dpEl('label',{text:'Subject'}),dpEl('input.dp-subj',{type:'text',value:w.subject,placeholder:'Subject','aria-label':'Subject',
     oninput:function(e){ w.subject=e.target.value; title.textContent=(w.subject||'Untitled')+' - Message'; dpComposeChanged(w); }})]));
-  var body=dpEl('div.dp-cwb',{contenteditable:'true',spellcheck:'true','aria-label':'Message body'}); body.innerHTML=w.html; w.bodyEl=body;
+  /* the one door into this document for a message body: whatever built w.html (a quote, a forward, a draft, a signature, a window restored), it is made safe here (safehtml.js) */
+  var body=dpEl('div.dp-cwb',{contenteditable:'true',spellcheck:'true','aria-label':'Message body'}); body.innerHTML=dpSafeHtml(w.html,true,true); w.html=body.innerHTML; w.bodyEl=body;
   body.addEventListener('input',function(){ w.html=body.innerHTML; dpComposeChanged(w); });
   body.addEventListener('keydown',function(e){ if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){ e.preventDefault(); dpComposeSend(w); } });
   var fileIn=dpEl('input',{type:'file',multiple:true,hidden:true,onchange:function(e){ dpComposeAddFiles(w,e.target.files); e.target.value=''; }});
@@ -4687,7 +4757,7 @@ function dpAskNotify(){ if(!('Notification' in window))return; if(Notification.p
 <script>
 /* Dispatch: the state, the boot and the router. Everything before this file defines functions;
    this one holds the one state object they share and runs. */
-var DP_BUILD='5bf9ee7';
+var DP_BUILD='62b1a9a';
 var DP={threads:{},msgs:{},lists:{},labels:[],sendAs:[],me:null,meSet:{},historyId:null,view:{mod:'mail',label:'INBOX',q:'',thread:null,msg:null,unread:false},sel:{},cursor:null,drag:null,
   syncing:false,loading:false,ready:false,authError:null,imgOk:{},cidCache:{},lastSync:0,lastChange:0,hashSelf:'',chord:'',ribbonTab:'home',fold:{cats:true,imap:true},expanded:{},searchScope:'mailbox',offline:false,
   people:{q:'',sel:null,editing:false},tasks:{lists:[],listId:null,items:[],showDone:false,open:null,loading:false},
