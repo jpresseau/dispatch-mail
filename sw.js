@@ -11,6 +11,7 @@
    sweep deletes nothing but caches carrying this worker's own prefix (tools/test/structure.test.js
    drives every worker and checks exactly that). */
 var VERSION = 'dispatch-v1';
+var WAIT = 4000;   /* how long the network has before the last good copy is shown instead */
 var SHELL = ['./', './index.html', './manifest.webmanifest', './favicon.svg',
              './apple-touch-icon.png', './icon-192.png', './icon-512.png'];
 
@@ -42,17 +43,29 @@ self.addEventListener('fetch', function (e) {
   if (url.pathname.indexOf(HOME) !== 0) return;
   if (/\/build\.txt$/.test(url.pathname)) return;       /* the stale check must reach the server or fail */
 
-  e.respondWith(
-    fetch(req).then(function (res) {
-      if (res && res.ok) {
-        var copy = res.clone();
-        caches.open(VERSION).then(function (c) { c.put(req, copy); });
-      }
-      return res;
-    }).catch(function () {
-      return caches.match(req, { ignoreSearch: true }).then(function (hit) {
-        return hit || caches.match('./index.html');
-      });
-    })
-  );
+  /* Network-first, but not for ever: a stalled connection (a lift, a train, a captive Wi-Fi page that
+     never answers) gave a blank app until the request finally failed. After WAIT ms the last good
+     copy is shown, if there is one, and the network's answer still lands in the cache when it
+     comes (waitUntil). With nothing cached it keeps waiting, since nothing is better than a page. */
+  var net = fetch(req).then(function (res) {
+    if (res && res.ok) {
+      var copy = res.clone();
+      return caches.open(VERSION).then(function (c) { return c.put(req, copy); }).then(function () { return res; }, function () { return res; });
+    }
+    return res;
+  });
+  e.waitUntil(net.catch(function () {}));
+  var cached = function (orShell) {
+    return caches.match(req, { ignoreSearch: true }).then(function (hit) {
+      return hit || (orShell ? caches.match('./index.html') : null);
+    });
+  };
+  e.respondWith(new Promise(function (resolve, reject) {
+    var done = false;
+    var give = function (r) { if (done || !r) return false; done = true; resolve(r); return true; };
+    net.then(give, function (err) {
+      cached(true).then(function (hit) { if (!give(hit) && !done) { done = true; reject(err); } });
+    });
+    setTimeout(function () { if (!done) cached(req.mode === 'navigate').then(give); }, WAIT);
+  }));
 });
